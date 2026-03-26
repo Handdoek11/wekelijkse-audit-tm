@@ -86,6 +86,34 @@
       border-top: 1px solid var(--border);
     }
 
+    /* Recurring Tasks */
+    .tasks-section { margin-top: 48px; }
+    .tasks-section h2 { font-size: 1.25rem; font-weight: 700; margin-bottom: 20px; }
+    .task-group { margin-bottom: 28px; }
+    .task-group h3 {
+      font-size: 0.8rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.06em; color: var(--muted); margin-bottom: 10px;
+      padding-bottom: 6px; border-bottom: 1px solid var(--border);
+    }
+    .task-list { list-style: none; }
+    .task-list li {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 8px 0; border-bottom: 1px solid #F3F4F6;
+      font-size: 0.9rem;
+    }
+    .task-list li:last-child { border-bottom: none; }
+    .freq {
+      flex-shrink: 0; font-size: 0.7rem; font-weight: 600;
+      padding: 2px 8px; border-radius: 4px; min-width: 70px;
+      text-align: center; text-transform: uppercase;
+    }
+    .freq.weekly { background: #DBEAFE; color: #1D4ED8; }
+    .freq.biweekly { background: #E0E7FF; color: #4338CA; }
+    .freq.monthly { background: #FEF3C7; color: #92400E; }
+    .freq.quarterly { background: #FCE7F3; color: #9D174D; }
+    .task-text { flex: 1; }
+    .task-text .desc { color: var(--muted); font-size: 0.8rem; }
+
     @media (max-width: 600px) {
       .charts { grid-template-columns: 1fr; }
       .cards { grid-template-columns: repeat(2, 1fr); }
@@ -95,13 +123,52 @@
 <body>
 
 <header>
-  <h1>TalkMark Weekly Metrics</h1>
+  <h1>TalkMark Dashboard</h1>
   <span class="updated" id="updated"></span>
 </header>
 
 <div id="summary" class="cards"></div>
 <div id="charts" class="charts"></div>
 <div id="error" class="error" style="display:none"></div>
+
+<section class="tasks-section">
+  <h2>Recurring Tasks</h2>
+
+  <div class="task-group">
+    <h3>Content & SEO</h3>
+    <ul class="task-list">
+      <li><span class="freq weekly">Wekelijks</span><div class="task-text">Social media post plannen & publiceren<div class="desc">LinkedIn, Instagram, X — mix van tips, updates en testimonials</div></div></li>
+      <li><span class="freq biweekly">2-wekelijks</span><div class="task-text">Nieuwe blogpost schrijven & publiceren<div class="desc">SEO-geoptimaliseerd, 800-1200 woorden, interne links bijwerken</div></div></li>
+      <li><span class="freq monthly">Maandelijks</span><div class="task-text">ASO review (App Store & Play Store)<div class="desc">Screenshots, beschrijving, keywords updaten op basis van trends</div></div></li>
+      <li><span class="freq monthly">Maandelijks</span><div class="task-text">Keyword research & content gap analyse<div class="desc">Nieuwe zoektermen identificeren, concurrenten monitoren</div></div></li>
+      <li><span class="freq quarterly">Kwartaal</span><div class="task-text">Content audit — bestaande blogs verversen<div class="desc">Verouderde statistieken updaten, broken links fixen, CTA's reviewen</div></div></li>
+    </ul>
+  </div>
+
+  <div class="task-group">
+    <h3>Product & Tech</h3>
+    <ul class="task-list">
+      <li><span class="freq weekly">Wekelijks</span><div class="task-text">User feedback & reviews doorlezen<div class="desc">App Store, Play Store, support inbox — patronen signaleren</div></div></li>
+      <li><span class="freq biweekly">2-wekelijks</span><div class="task-text">Dependency updates checken<div class="desc">npm audit, Flutter packages, security advisories</div></div></li>
+      <li><span class="freq monthly">Maandelijks</span><div class="task-text">App release / update uitbrengen<div class="desc">Bugfixes, kleine verbeteringen, release notes schrijven</div></div></li>
+      <li><span class="freq monthly">Maandelijks</span><div class="task-text">Performance & crash monitoring review<div class="desc">Firebase Crashlytics, laadtijden, API response times</div></div></li>
+      <li><span class="freq quarterly">Kwartaal</span><div class="task-text">Security audit<div class="desc">API keys roteren, RLS policies reviewen, dependency vulnerabilities</div></div></li>
+      <li><span class="freq quarterly">Kwartaal</span><div class="task-text">Backup & disaster recovery test<div class="desc">Database restore testen, recovery procedure doorlopen</div></div></li>
+    </ul>
+  </div>
+
+  <div class="task-group">
+    <h3>Business & Growth</h3>
+    <ul class="task-list">
+      <li><span class="freq weekly">Wekelijks</span><div class="task-text">KPI dashboard reviewen<div class="desc">Trends in MRR, churn, signups, sessies analyseren</div></div></li>
+      <li><span class="freq monthly">Maandelijks</span><div class="task-text">Churn analyse — opgezegde gebruikers onderzoeken<div class="desc">Redenen achterhalen, win-back email overwegen</div></div></li>
+      <li><span class="freq monthly">Maandelijks</span><div class="task-text">Financiele rapportage<div class="desc">MRR ontwikkeling, kosten overzicht, runway berekening</div></div></li>
+      <li><span class="freq monthly">Maandelijks</span><div class="task-text">Competitor analyse<div class="desc">Nieuwe features, pricing changes, markttrends monitoren</div></div></li>
+      <li><span class="freq quarterly">Kwartaal</span><div class="task-text">Pricing strategie evalueren<div class="desc">Conversie per plan, willingness-to-pay, eventuele aanpassingen</div></div></li>
+      <li><span class="freq quarterly">Kwartaal</span><div class="task-text">OKR / doelen review & planning<div class="desc">Voortgang beoordelen, nieuwe doelen stellen voor volgend kwartaal</div></div></li>
+    </ul>
+  </div>
+</section>
 
 <footer>Data collected automatically every day at 06:00 UTC via GitHub Actions</footer>
 
