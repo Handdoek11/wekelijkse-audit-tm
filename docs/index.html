@@ -3,122 +3,93 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TalkMark — Weekly Metrics</title>
+  <title>TalkMark Dashboard</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3"></script>
   <style>
     :root {
-      --ios: #007AFF;
-      --android: #34A853;
-      --revenue: #7C3AED;
-      --sessions: #0D9488;
-      --signups: #F59E0B;
-      --bg: #F9FAFB;
-      --card: #FFFFFF;
-      --text: #111827;
-      --muted: #6B7280;
-      --border: #E5E7EB;
-      --positive: #10B981;
-      --negative: #EF4444;
+      --ios: #007AFF; --android: #34A853; --revenue: #7C3AED;
+      --sessions: #0D9488; --signups: #F59E0B; --bounce: #EF4444;
+      --bg: #F9FAFB; --card: #FFFFFF; --text: #111827;
+      --muted: #6B7280; --border: #E5E7EB;
+      --positive: #10B981; --negative: #EF4444;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      padding: 24px;
-      max-width: 1280px;
-      margin: 0 auto;
-    }
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      margin-bottom: 24px;
-    }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); padding: 24px; max-width: 1280px; margin: 0 auto; }
+
+    header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 24px; }
     header h1 { font-size: 1.5rem; font-weight: 700; }
     header .updated { color: var(--muted); font-size: 0.85rem; }
 
-    .cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 12px;
-      margin-bottom: 32px;
-    }
-    .card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 16px;
-    }
+    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 32px; }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 16px; }
     .card .label { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
     .card .value { font-size: 1.5rem; font-weight: 700; margin: 4px 0; }
     .card .delta { font-size: 0.8rem; font-weight: 500; }
     .card .delta.up { color: var(--positive); }
     .card .delta.down { color: var(--negative); }
 
-    .charts {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
-      gap: 24px;
-    }
-    .chart-box {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 16px;
-    }
+    .charts { display: grid; grid-template-columns: repeat(auto-fit, minmax(500px, 1fr)); gap: 24px; }
+    .chart-box { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 16px; }
     .chart-box h2 { font-size: 0.95rem; font-weight: 600; margin-bottom: 12px; }
     .chart-box canvas { width: 100% !important; height: 280px !important; }
 
-    .error, .empty {
-      text-align: center;
-      padding: 80px 20px;
-      color: var(--muted);
-      font-size: 1rem;
-    }
-    footer {
-      text-align: center;
-      color: var(--muted);
-      font-size: 0.8rem;
-      margin-top: 40px;
-      padding-top: 20px;
-      border-top: 1px solid var(--border);
-    }
+    .error { text-align: center; padding: 80px 20px; color: var(--muted); font-size: 1rem; }
 
-    /* Recurring Tasks */
+    footer { text-align: center; color: var(--muted); font-size: 0.8rem; margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border); }
+
+    /* ── Tasks: ADHD-friendly ── */
     .tasks-section { margin-top: 48px; }
-    .tasks-section h2 { font-size: 1.25rem; font-weight: 700; margin-bottom: 20px; }
-    .task-group { margin-bottom: 28px; }
-    .task-group h3 {
-      font-size: 0.8rem; font-weight: 600; text-transform: uppercase;
-      letter-spacing: 0.06em; color: var(--muted); margin-bottom: 10px;
-      padding-bottom: 6px; border-bottom: 1px solid var(--border);
+    .tasks-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px; }
+    .tasks-header h2 { font-size: 1.25rem; font-weight: 700; margin: 0; }
+    .filter-tabs { display: flex; gap: 6px; }
+    .filter-tabs button {
+      padding: 6px 16px; border-radius: 20px; border: 1px solid var(--border);
+      background: var(--card); color: var(--muted); font-size: 0.8rem; font-weight: 500;
+      cursor: pointer; transition: all 0.15s;
     }
-    .task-list { list-style: none; }
-    .task-list li {
-      display: flex; align-items: flex-start; gap: 10px;
-      padding: 8px 0; border-bottom: 1px solid #F3F4F6;
-      font-size: 0.9rem;
+    .filter-tabs button.active { background: var(--text); color: white; border-color: var(--text); }
+    .filter-tabs button:hover:not(.active) { border-color: var(--muted); }
+
+    details.tg {
+      background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+      margin-bottom: 8px; overflow: hidden;
     }
-    .task-list li:last-child { border-bottom: none; }
-    .freq {
-      flex-shrink: 0; font-size: 0.7rem; font-weight: 600;
-      padding: 2px 8px; border-radius: 4px; min-width: 70px;
-      text-align: center; text-transform: uppercase;
+    details.tg[open] { margin-bottom: 12px; }
+    details.tg summary {
+      display: flex; align-items: center; gap: 10px; padding: 14px 16px;
+      cursor: pointer; font-size: 0.85rem; font-weight: 600; list-style: none; user-select: none;
     }
-    .freq.weekly { background: #DBEAFE; color: #1D4ED8; }
-    .freq.biweekly { background: #E0E7FF; color: #4338CA; }
-    .freq.monthly { background: #FEF3C7; color: #92400E; }
-    .freq.daily { background: #D1FAE5; color: #065F46; }
-    .freq.quarterly { background: #FCE7F3; color: #9D174D; }
-    .freq.yearly { background: #F3E8FF; color: #6B21A8; }
-    .task-text { flex: 1; }
-    .task-text .desc { color: var(--muted); font-size: 0.8rem; }
+    details.tg summary::-webkit-details-marker { display: none; }
+    details.tg summary::before { content: "\25B6"; font-size: 0.55rem; color: var(--muted); transition: transform 0.15s; }
+    details.tg[open] summary::before { transform: rotate(90deg); }
+    .tg-count { margin-left: auto; font-size: 0.72rem; font-weight: 400; color: var(--muted); background: var(--bg); padding: 2px 10px; border-radius: 10px; }
+
+    .tl { list-style: none; padding: 0 16px 12px; }
+    .tl li { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid #F3F4F6; font-size: 0.88rem; }
+    .tl li:last-child { border-bottom: none; }
+    .tl .bar { width: 4px; min-height: 28px; border-radius: 2px; flex-shrink: 0; align-self: stretch; }
+    .bar.daily { background: #10B981; } .bar.weekly { background: #3B82F6; }
+    .bar.biweekly { background: #6366F1; } .bar.monthly { background: #F59E0B; }
+    .bar.quarterly { background: #EC4899; } .bar.yearly { background: #8B5CF6; }
+
+    .freq { flex-shrink: 0; font-size: 0.62rem; font-weight: 600; padding: 2px 7px; border-radius: 4px; min-width: 52px; text-align: center; text-transform: uppercase; }
+    .freq.daily { background: #D1FAE5; color: #065F46; } .freq.weekly { background: #DBEAFE; color: #1D4ED8; }
+    .freq.biweekly { background: #E0E7FF; color: #4338CA; } .freq.monthly { background: #FEF3C7; color: #92400E; }
+    .freq.quarterly { background: #FCE7F3; color: #9D174D; } .freq.yearly { background: #F3E8FF; color: #6B21A8; }
+
+    .tc { flex: 1; min-width: 0; }
+    .tc .tt { font-weight: 500; }
+    .tc .td { color: var(--muted); font-size: 0.78rem; margin-top: 2px; max-height: 0; overflow: hidden; transition: max-height 0.2s; }
+    .tl li:hover .td { max-height: 60px; }
+
+    .tasks-empty { text-align: center; padding: 32px; color: var(--muted); font-size: 0.9rem; }
 
     @media (max-width: 600px) {
       .charts { grid-template-columns: 1fr; }
       .cards { grid-template-columns: repeat(2, 1fr); }
+      .filter-tabs { width: 100%; }
+      .filter-tabs button { flex: 1; padding: 8px 6px; font-size: 0.75rem; }
     }
   </style>
 </head>
@@ -134,291 +105,181 @@
 <div id="error" class="error" style="display:none"></div>
 
 <section class="tasks-section">
-  <h2>Recurring Tasks</h2>
-
-  <div class="task-group">
-    <h3>Content & SEO</h3>
-    <ul class="task-list">
-      <li><span class="freq weekly">Wekelijks</span><div class="task-text">Social media post plannen & publiceren<div class="desc">LinkedIn, Instagram, X — mix van tips, updates en testimonials</div></div></li>
-      <li><span class="freq biweekly">2-wekelijks</span><div class="task-text">Nieuwe blogpost schrijven & publiceren<div class="desc">SEO-geoptimaliseerd, 800-1200 woorden, interne links bijwerken</div></div></li>
-      <li><span class="freq monthly">Maandelijks</span><div class="task-text">ASO review (App Store & Play Store)<div class="desc">Screenshots, beschrijving, keywords updaten op basis van trends</div></div></li>
-      <li><span class="freq monthly">Maandelijks</span><div class="task-text">Keyword research & content gap analyse<div class="desc">Nieuwe zoektermen identificeren, concurrenten monitoren</div></div></li>
-      <li><span class="freq quarterly">Kwartaal</span><div class="task-text">Content audit — bestaande blogs verversen<div class="desc">Verouderde statistieken updaten, broken links fixen, CTA's reviewen</div></div></li>
-    </ul>
+  <div class="tasks-header">
+    <h2>Taken</h2>
+    <div class="filter-tabs">
+      <button class="active" data-f="today">Vandaag</button>
+      <button data-f="week">Deze week</button>
+      <button data-f="month">Deze maand</button>
+      <button data-f="all">Alles</button>
+    </div>
   </div>
-
-  <div class="task-group">
-    <h3>Product & Tech</h3>
-    <ul class="task-list">
-      <li><span class="freq weekly">Wekelijks</span><div class="task-text">User feedback & reviews doorlezen<div class="desc">App Store, Play Store, support inbox — patronen signaleren</div></div></li>
-      <li><span class="freq weekly">Wekelijks</span><div class="task-text">API quota & rate limits monitoren<div class="desc">Whisper/AssemblyAI, GPT, Mollie, OneSignal — alerts bij 70% van limiet</div></div></li>
-      <li><span class="freq biweekly">2-wekelijks</span><div class="task-text">Dependency updates checken<div class="desc">npm audit, Flutter pub.dev packages, SDK's (Supabase, RevenueCat, OneSignal)</div></div></li>
-      <li><span class="freq monthly">Maandelijks</span><div class="task-text">App release / update uitbrengen<div class="desc">Bugfixes, kleine verbeteringen, release notes schrijven</div></div></li>
-      <li><span class="freq monthly">Maandelijks</span><div class="task-text">Performance & crash monitoring review<div class="desc">Firebase Crashlytics, laadtijden, API response times, app startup &lt; 2s</div></div></li>
-      <li><span class="freq monthly">Maandelijks</span><div class="task-text">AI/ML model updates checken<div class="desc">Whisper, AssemblyAI, GPT changelogs — nieuwe versies, pricing, kwaliteitsverbeteringen</div></div></li>
-      <li><span class="freq monthly">Maandelijks</span><div class="task-text">Database query performance analyse<div class="desc">Slow queries identificeren in Supabase, indexes optimaliseren, p99 &lt; 500ms</div></div></li>
-      <li><span class="freq quarterly">Kwartaal</span><div class="task-text">AI model upgrade evalueren & testen<div class="desc">Nieuwe modellen benchmarken tegen huidige setup, kosten/kwaliteit afwegen</div></div></li>
-      <li><span class="freq quarterly">Kwartaal</span><div class="task-text">Security audit<div class="desc">API keys roteren, RLS policies reviewen, dependency vulnerabilities</div></div></li>
-      <li><span class="freq quarterly">Kwartaal</span><div class="task-text">Backup & disaster recovery test<div class="desc">Database restore testen, recovery procedure doorlopen</div></div></li>
-    </ul>
-  </div>
-
-  <div class="task-group">
-    <h3>Advertising & Acquisitie</h3>
-    <ul class="task-list">
-      <li><span class="freq weekly">Wekelijks</span><div class="task-text">Google Ads campagne optimalisatie<div class="desc">Ondermaatse keywords pauzeren, negatieve keywords toevoegen, budget pacing checken</div></div></li>
-      <li><span class="freq biweekly">2-wekelijks</span><div class="task-text">Meta Ads optimalisatie<div class="desc">Frequentie checken (max 4-6x/week), 3-5 nieuwe creatives testen, lookalike audiences</div></div></li>
-      <li><span class="freq monthly">Maandelijks</span><div class="task-text">Ads ROI rapportage<div class="desc">CAC en payback period per kanaal berekenen, best presterende cohorten identificeren</div></div></li>
-      <li><span class="freq monthly">Maandelijks</span><div class="task-text">Ad account health check<div class="desc">Spend reconcilen met Mollie, attributie-accuracy verifiëren, oude campagnes archiveren</div></div></li>
-      <li><span class="freq monthly">Maandelijks</span><div class="task-text">Conversie-tracking & attributie valideren<div class="desc">Google Ads conversion pixels, Meta Pixel en RevenueCat events testen — breekt snel na app/website updates</div></div></li>
-    </ul>
-  </div>
-
-  <div class="task-group">
-    <h3>Notificaties & Retentie</h3>
-    <ul class="task-list">
-      <li><span class="freq biweekly">2-wekelijks</span><div class="task-text">Push notificatie campagnes plannen (OneSignal)<div class="desc">Onboarding (dag 1-7), feature tips (actief), win-back (inactief) — max 2-3/week</div></div></li>
-      <li><span class="freq monthly">Maandelijks</span><div class="task-text">Notificatie opt-out rates analyseren<div class="desc">Spike = te veel verstuurd. Frequentie/content aanpassen bij &gt;5% opt-out</div></div></li>
-      <li><span class="freq monthly">Maandelijks</span><div class="task-text">User segmenten onderhouden<div class="desc">OneSignal segmenten reviewen: actief/inactief/churned drempels bijwerken</div></div></li>
-      <li><span class="freq quarterly">Kwartaal</span><div class="task-text">Win-back campagne voor inactieve gebruikers<div class="desc">Gebruikers 30+ dagen inactief targeten met speciale aanbieding of nieuwe feature</div></div></li>
-    </ul>
-  </div>
-
-  <div class="task-group">
-    <h3>Business & Growth</h3>
-    <ul class="task-list">
-      <li><span class="freq weekly">Wekelijks</span><div class="task-text">KPI dashboard reviewen<div class="desc">Trends in MRR, churn, signups, sessies analyseren</div></div></li>
-      <li><span class="freq monthly">Maandelijks</span><div class="task-text">Churn analyse — opgezegde gebruikers onderzoeken<div class="desc">Redenen achterhalen, win-back email overwegen</div></div></li>
-      <li><span class="freq monthly">Maandelijks</span><div class="task-text">Financiele rapportage<div class="desc">MRR ontwikkeling, kosten overzicht (Supabase, API's, ads), runway berekening</div></div></li>
-      <li><span class="freq monthly">Maandelijks</span><div class="task-text">API & cloud kosten tracking<div class="desc">Kosten per vendor uitsplitsen: AssemblyAI, GPT, Mollie, Supabase, ads — unit economics bewaken</div></div></li>
-      <li><span class="freq monthly">Maandelijks</span><div class="task-text">Competitor analyse<div class="desc">Nieuwe features, pricing changes, markttrends monitoren</div></div></li>
-      <li><span class="freq monthly">Maandelijks</span><div class="task-text">Cohort retentie analyse<div class="desc">Retentie per acquisitiekanaal vergelijken, budget verschuiven naar beste kanalen</div></div></li>
-      <li><span class="freq monthly">Maandelijks</span><div class="task-text">Partnership mogelijkheden verkennen<div class="desc">Integraties met Notion/Obsidian/Slack, samenwerkingen met podcast-platforms</div></div></li>
-      <li><span class="freq quarterly">Kwartaal</span><div class="task-text">Pricing strategie evalueren<div class="desc">Conversie per plan, willingness-to-pay, trial-duur testen (7 vs 14 vs 30 dagen)</div></div></li>
-      <li><span class="freq quarterly">Kwartaal</span><div class="task-text">OKR / doelen review & planning<div class="desc">Voortgang beoordelen, nieuwe doelen stellen voor volgend kwartaal</div></div></li>
-    </ul>
-  </div>
-
-  <div class="task-group">
-    <h3>Legal & Compliance (GDPR / EU)</h3>
-    <ul class="task-list">
-      <li><span class="freq biweekly">2-wekelijks</span><div class="task-text">Audio retentie & verwijderbeleid controleren<div class="desc">Verifieer dat ruwe audio na retentieperiode verwijderd wordt, GDPR data minimalisatie</div></div></li>
-      <li><span class="freq monthly">Maandelijks</span><div class="task-text">GDPR data subject requests verwerken<div class="desc">Inzage, correctie, verwijdering — binnen 30 dagen reageren, documenteren</div></div></li>
-      <li><span class="freq monthly">Maandelijks</span><div class="task-text">App Store & Play Store policy changes checken<div class="desc">Privacy-eisen, subscription regels, AI-disclosure vereisten monitoren</div></div></li>
-      <li><span class="freq monthly">Maandelijks</span><div class="task-text">RevenueCat configuratie audit<div class="desc">Offerings, trial-lengtes, pricing matchen met App Store/Play Store configuratie</div></div></li>
-      <li><span class="freq quarterly">Kwartaal</span><div class="task-text">Privacy policy & algemene voorwaarden reviewen<div class="desc">Bijwerken bij nieuwe features, AI-vendors, data-retentie wijzigingen</div></div></li>
-      <li><span class="freq quarterly">Kwartaal</span><div class="task-text">DPA audit — verwerkersovereenkomsten leveranciers<div class="desc">Supabase, AssemblyAI, OpenAI, Mollie, RevenueCat, OneSignal — actuele DPA's verifiëren</div></div></li>
-      <li><span class="freq quarterly">Kwartaal</span><div class="task-text">App privacy declarations verifiëren<div class="desc">Data-verzameling in App Store Connect en Play Console klopt met werkelijkheid</div></div></li>
-    </ul>
-  </div>
-
-  <div class="task-group">
-    <h3>Financieel & Fiscaal (Securyflex B.V.)</h3>
-    <ul class="task-list">
-      <li><span class="freq quarterly">Kwartaal</span><div class="task-text">BTW-aangifte indienen<div class="desc">Omzetbelasting berekenen en indienen, deadline: laatste werkdag maand na kwartaal</div></div></li>
-      <li><span class="freq quarterly">Kwartaal</span><div class="task-text">Belastingvoorziening reserveren<div class="desc">15-20% van netto winst apart zetten voor VPB (19%) en dividendbelasting</div></div></li>
-      <li><span class="freq quarterly">Kwartaal</span><div class="task-text">Mollie & bank reconciliatie<div class="desc">Mollie-uitbetalingen matchen met bankafschriften, openstaande posten opschonen</div></div></li>
-      <li><span class="freq yearly">Jaarlijks</span><div class="task-text">Jaarrekening & VPB-aangifte voorbereiden<div class="desc">Winst- & verliesrekening, balans opstellen, deadline 1 mei volgend jaar. Overweeg boekhouder (€500-1000/jr)</div></div></li>
-    </ul>
-  </div>
-
-  <div class="task-group">
-    <h3>Support & Community</h3>
-    <ul class="task-list">
-      <li><span class="freq daily">Dagelijks</span><div class="task-text">Support inbox triagen (max 30 min)<div class="desc">Alle berichten binnen 24 uur beantwoorden, terugkerende vragen notieren voor FAQ</div></div></li>
-      <li><span class="freq biweekly">2-wekelijks</span><div class="task-text">FAQ & knowledge base uitbreiden<div class="desc">Top 3-5 veelgestelde vragen toevoegen: transcriptie-kwaliteit, abonnementen, privacy</div></div></li>
-      <li><span class="freq biweekly">2-wekelijks</span><div class="task-text">Community engagement<div class="desc">Reddit, Indie Hackers, Product Hunt monitoren op TalkMark-mentions en transcriptie-vragen</div></div></li>
-      <li><span class="freq monthly">Maandelijks</span><div class="task-text">Support metrics reviewen<div class="desc">Gemiddelde responstijd, oplossingspercentage, churn-correlatie met support-contacten</div></div></li>
-    </ul>
-  </div>
+  <div id="tc"></div>
 </section>
 
-<footer>Data collected automatically every day at 06:00 UTC via GitHub Actions</footer>
+<footer>Data wordt dagelijks om 06:00 UTC automatisch verzameld via GitHub Actions</footer>
 
 <script>
-// ============================================================
-// CONFIGURATION — update these two values for your project
-// ============================================================
+// ── CONFIG ──
 const SUPABASE_URL  = "https://uznutxihifijmlgrfime.supabase.co";
 const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV6bnV0eGloaWZpam1sZ3JmaW1lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkyOTY2NTcsImV4cCI6MjA3NDg3MjY1N30.gZBHj-qIyp11FoI6PUGvOtXZglopkh8uz3_JAJERWds";
-// ============================================================
-
 const API = `${SUPABASE_URL}/rest/v1/weekly_metrics?apikey=${SUPABASE_ANON}&order=date.asc&limit=90`;
 
-const COLORS = {
-  ios: "#007AFF", android: "#34A853", revenue: "#7C3AED",
-  sessions: "#0D9488", signups: "#F59E0B", bounce: "#EF4444",
-};
+// ── METRICS DASHBOARD ──
+const COLORS = { ios: "#007AFF", android: "#34A853", revenue: "#7C3AED", sessions: "#0D9488", signups: "#F59E0B", bounce: "#EF4444" };
 
 (async () => {
   try {
     const res = await fetch(API, { headers: { Accept: "application/json" } });
     if (!res.ok) throw new Error(`API returned ${res.status}`);
     const rows = await res.json();
-
-    if (!rows.length) {
-      document.getElementById("error").style.display = "block";
-      document.getElementById("error").textContent = "No data yet. Run the collection pipeline first.";
-      return;
-    }
-
+    if (!rows.length) { document.getElementById("error").style.display = "block"; document.getElementById("error").textContent = "No data yet."; return; }
     renderSummary(rows);
     renderCharts(rows);
-
-    const latest = rows[rows.length - 1];
-    document.getElementById("updated").textContent = `${latest.date}`;
+    document.getElementById("updated").textContent = rows[rows.length - 1].date;
   } catch (err) {
     document.getElementById("error").style.display = "block";
-    document.getElementById("error").innerHTML =
-      `<strong>Failed to load data</strong><br>${err.message}<br><br>Check your Supabase URL and anon key in the script.`;
+    document.getElementById("error").innerHTML = `<strong>Failed to load data</strong><br>${err.message}`;
   }
 })();
 
-// ── Summary Cards ──────────────────────────────────────────
-
 function renderSummary(rows) {
-  const curr = rows[rows.length - 1];
-  const prev = rows.length > 1 ? rows[rows.length - 2] : null;
-
+  const c = rows[rows.length - 1], p = rows.length > 1 ? rows[rows.length - 2] : null;
   const cards = [
-    { label: "MRR",           value: fmt(curr.mrr, "€"),           delta: pctChange(curr.mrr, prev?.mrr) },
-    { label: "Churn Rate",    value: fmt(curr.churn_rate, "", "%"), delta: pctChange(curr.churn_rate, prev?.churn_rate, true) },
-    { label: "New Signups",   value: fmt(curr.new_signups),        delta: pctChange(curr.new_signups, prev?.new_signups) },
-    { label: "Active Users",  value: fmt(curr.active_users),       delta: pctChange(curr.active_users, prev?.active_users) },
-    { label: "Sessions",      value: fmt(curr.ga4_sessions),       delta: pctChange(curr.ga4_sessions, prev?.ga4_sessions) },
-    { label: "Bounce Rate",   value: fmtPct(curr.ga4_bounce_rate), delta: pctChange(curr.ga4_bounce_rate, prev?.ga4_bounce_rate, true) },
-    { label: "iOS Downloads", value: fmt(curr.ios_downloads),      delta: pctChange(curr.ios_downloads, prev?.ios_downloads) },
-    { label: "Android Downloads", value: fmt(curr.android_downloads), delta: pctChange(curr.android_downloads, prev?.android_downloads) },
+    { label: "MRR", value: fmt(c.mrr, "\u20AC"), delta: pctChange(c.mrr, p?.mrr) },
+    { label: "Churn Rate", value: fmt(c.churn_rate, "", "%"), delta: pctChange(c.churn_rate, p?.churn_rate, true) },
+    { label: "New Signups", value: fmt(c.new_signups), delta: pctChange(c.new_signups, p?.new_signups) },
+    { label: "Active Users", value: fmt(c.active_users), delta: pctChange(c.active_users, p?.active_users) },
+    { label: "Sessions", value: fmt(c.ga4_sessions), delta: pctChange(c.ga4_sessions, p?.ga4_sessions) },
+    { label: "Bounce Rate", value: fmtPct(c.ga4_bounce_rate), delta: pctChange(c.ga4_bounce_rate, p?.ga4_bounce_rate, true) },
+    { label: "iOS Downloads", value: fmt(c.ios_downloads), delta: pctChange(c.ios_downloads, p?.ios_downloads) },
+    { label: "Android Downloads", value: fmt(c.android_downloads), delta: pctChange(c.android_downloads, p?.android_downloads) },
   ];
-
-  const container = document.getElementById("summary");
-  container.innerHTML = cards.map((c) => `
-    <div class="card">
-      <div class="label">${c.label}</div>
-      <div class="value">${c.value}</div>
-      ${c.delta !== null ? `<div class="delta ${c.delta.cls}">${c.delta.text}</div>` : ""}
-    </div>
-  `).join("");
+  document.getElementById("summary").innerHTML = cards.map(c => `<div class="card"><div class="label">${c.label}</div><div class="value">${c.value}</div>${c.delta ? `<div class="delta ${c.delta.cls}">${c.delta.text}</div>` : ""}</div>`).join("");
 }
 
-// ── Charts ─────────────────────────────────────────────────
-
 function renderCharts(rows) {
-  const labels = rows.map((r) => r.date);
-  const container = document.getElementById("charts");
-
-  const charts = [
-    {
-      title: "Sessions & Users",
-      datasets: [
-        ds("Sessions", rows, "ga4_sessions", COLORS.sessions),
-        ds("Active Users", rows, "ga4_users", COLORS.signups),
-      ],
-    },
-    {
-      title: "Downloads",
-      datasets: [
-        ds("iOS", rows, "ios_downloads", COLORS.ios),
-        ds("Android", rows, "android_downloads", COLORS.android),
-      ],
-    },
-    {
-      title: "App Ratings",
-      datasets: [
-        ds("iOS", rows, "ios_rating", COLORS.ios),
-        ds("Android", rows, "android_rating", COLORS.android),
-      ],
-      yMin: 1, yMax: 5,
-    },
-    {
-      title: "Monthly Recurring Revenue",
-      datasets: [
-        { ...ds("MRR", rows, "mrr", COLORS.revenue), fill: true, backgroundColor: COLORS.revenue + "20" },
-      ],
-    },
-    {
-      title: "New Signups",
-      datasets: [ds("Signups", rows, "new_signups", COLORS.signups)],
-      type: "bar",
-    },
-    {
-      title: "Crashes",
-      datasets: [
-        ds("iOS", rows, "ios_crashes", COLORS.ios),
-        ds("Android", rows, "android_crashes", COLORS.android),
-      ],
-    },
+  const labels = rows.map(r => r.date), el = document.getElementById("charts");
+  const cfgs = [
+    { title: "Sessions & Users", datasets: [ds("Sessions", rows, "ga4_sessions", COLORS.sessions), ds("Users", rows, "ga4_users", COLORS.signups)] },
+    { title: "Downloads", datasets: [ds("iOS", rows, "ios_downloads", COLORS.ios), ds("Android", rows, "android_downloads", COLORS.android)] },
+    { title: "App Ratings", datasets: [ds("iOS", rows, "ios_rating", COLORS.ios), ds("Android", rows, "android_rating", COLORS.android)], yMin: 1, yMax: 5 },
+    { title: "MRR", datasets: [{ ...ds("MRR", rows, "mrr", COLORS.revenue), fill: true, backgroundColor: COLORS.revenue + "20" }] },
+    { title: "Signups", datasets: [ds("Signups", rows, "new_signups", COLORS.signups)], type: "bar" },
+    { title: "Crashes", datasets: [ds("iOS", rows, "ios_crashes", COLORS.ios), ds("Android", rows, "android_crashes", COLORS.android)] },
   ];
-
-  for (const cfg of charts) {
-    const box = document.createElement("div");
-    box.className = "chart-box";
-    box.innerHTML = `<h2>${cfg.title}</h2><canvas></canvas>`;
-    container.appendChild(box);
-
+  for (const cfg of cfgs) {
+    const box = document.createElement("div"); box.className = "chart-box";
+    box.innerHTML = `<h2>${cfg.title}</h2><canvas></canvas>`; el.appendChild(box);
     new Chart(box.querySelector("canvas"), {
-      type: cfg.type ?? "line",
-      data: { labels, datasets: cfg.datasets },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        interaction: { mode: "index", intersect: false },
+      type: cfg.type ?? "line", data: { labels, datasets: cfg.datasets },
+      options: { responsive: true, maintainAspectRatio: false, interaction: { mode: "index", intersect: false },
         plugins: { legend: { position: "bottom" } },
-        scales: {
-          x: {
-            type: "time",
-            time: { unit: "day", tooltipFormat: "MMM dd, yyyy" },
-          },
-          y: {
-            beginAtZero: cfg.yMin == null,
-            min: cfg.yMin,
-            max: cfg.yMax,
-          },
-        },
-      },
+        scales: { x: { type: "time", time: { unit: "day", tooltipFormat: "MMM dd, yyyy" } }, y: { beginAtZero: cfg.yMin == null, min: cfg.yMin, max: cfg.yMax } } }
     });
   }
 }
 
-// ── Helpers ────────────────────────────────────────────────
+function ds(label, rows, key, color) { return { label, data: rows.map(r => r[key]), borderColor: color, backgroundColor: color, borderWidth: 2, pointRadius: 3, tension: 0.3 }; }
+function fmt(val, pre = "", suf = "") { if (val == null) return "\u2014"; const n = +val; if (isNaN(n)) return "\u2014"; if (pre === "\u20AC") return `\u20AC${n.toLocaleString("nl-NL", { maximumFractionDigits: 0 })}`; return `${pre}${n.toLocaleString("en-US")}${suf}`; }
+function fmtPct(val) { if (val == null) return "\u2014"; const n = +val; if (isNaN(n)) return "\u2014"; return `${(n <= 1 ? n * 100 : n).toFixed(1)}%`; }
+function pctChange(curr, prev, inv = false) { if (curr == null || prev == null || prev === 0) return null; const p = ((curr - prev) / Math.abs(prev)) * 100; const up = p > 0; return { text: `${up ? "\u2191" : "\u2193"} ${Math.abs(p).toFixed(1)}%`, cls: inv ? (up ? "down" : "up") : (up ? "up" : "down") }; }
 
-function ds(label, rows, key, color) {
-  return {
-    label,
-    data: rows.map((r) => r[key]),
-    borderColor: color,
-    backgroundColor: color,
-    borderWidth: 2,
-    pointRadius: 3,
-    tension: 0.3,
-  };
+// ── RECURRING TASKS (ADHD-friendly: filter by relevance, collapsed groups, hover for details) ──
+const T = [
+  // daily
+  {t:"Support inbox triagen (max 30 min)",d:"Alle berichten binnen 24 uur beantwoorden, terugkerende vragen noteren",f:"daily",c:"Support & Community"},
+  // weekly
+  {t:"Social media post plannen & publiceren",d:"LinkedIn, Instagram, X \u2014 tips, updates en testimonials",f:"weekly",c:"Content & SEO"},
+  {t:"User feedback & reviews doorlezen",d:"App Store, Play Store, support inbox \u2014 patronen signaleren",f:"weekly",c:"Product & Tech"},
+  {t:"API quota & rate limits monitoren",d:"Whisper/AssemblyAI, GPT, Mollie, OneSignal \u2014 alert bij 70%",f:"weekly",c:"Product & Tech"},
+  {t:"Google Ads campagne optimalisatie",d:"Keywords pauzeren, negatieve keywords, budget pacing checken",f:"weekly",c:"Advertising"},
+  {t:"KPI dashboard reviewen",d:"Trends in MRR, churn, signups, sessies analyseren",f:"weekly",c:"Business & Growth"},
+  // biweekly
+  {t:"Nieuwe blogpost schrijven & publiceren",d:"SEO-geoptimaliseerd, 800-1200 woorden, interne links",f:"biweekly",c:"Content & SEO"},
+  {t:"Dependency updates checken",d:"npm audit, Flutter packages, SDK\u2019s (Supabase, RevenueCat, OneSignal)",f:"biweekly",c:"Product & Tech"},
+  {t:"Meta Ads optimalisatie",d:"Frequentie checken, 3-5 nieuwe creatives, lookalike audiences",f:"biweekly",c:"Advertising"},
+  {t:"Push notificatie campagnes (OneSignal)",d:"Onboarding (dag 1-7), feature tips (actief), win-back (inactief)",f:"biweekly",c:"Notificaties & Retentie"},
+  {t:"FAQ & knowledge base uitbreiden",d:"Top 3-5 veelgestelde vragen toevoegen",f:"biweekly",c:"Support & Community"},
+  {t:"Community engagement",d:"Reddit, Indie Hackers, Product Hunt \u2014 TalkMark-mentions monitoren",f:"biweekly",c:"Support & Community"},
+  {t:"Audio retentie & verwijderbeleid controleren",d:"GDPR data minimalisatie \u2014 ruwe audio na retentieperiode verwijderd?",f:"biweekly",c:"Legal & Compliance"},
+  // monthly
+  {t:"ASO review (App Store & Play Store)",d:"Screenshots, beschrijving, keywords updaten",f:"monthly",c:"Content & SEO"},
+  {t:"Keyword research & content gap analyse",d:"Nieuwe zoektermen, concurrenten monitoren",f:"monthly",c:"Content & SEO"},
+  {t:"App release / update uitbrengen",d:"Bugfixes, verbeteringen, release notes",f:"monthly",c:"Product & Tech"},
+  {t:"Performance & crash monitoring",d:"Firebase Crashlytics, laadtijden, API response times",f:"monthly",c:"Product & Tech"},
+  {t:"AI/ML model updates checken",d:"Whisper, AssemblyAI, GPT changelogs \u2014 nieuwe versies, pricing",f:"monthly",c:"Product & Tech"},
+  {t:"Database query performance",d:"Slow queries in Supabase, indexes optimaliseren",f:"monthly",c:"Product & Tech"},
+  {t:"Ads ROI rapportage",d:"CAC en payback period per kanaal berekenen",f:"monthly",c:"Advertising"},
+  {t:"Ad account health check",d:"Spend reconcilen, attributie verifi\u00EBren, campagnes archiveren",f:"monthly",c:"Advertising"},
+  {t:"Conversie-tracking valideren",d:"Google Ads pixels, Meta Pixel, RevenueCat events testen",f:"monthly",c:"Advertising"},
+  {t:"Notificatie opt-out rates analyseren",d:"Frequentie aanpassen bij >5% opt-out",f:"monthly",c:"Notificaties & Retentie"},
+  {t:"User segmenten onderhouden",d:"OneSignal segmenten: actief/inactief/churned drempels bijwerken",f:"monthly",c:"Notificaties & Retentie"},
+  {t:"Churn analyse",d:"Opgezegde gebruikers onderzoeken, win-back overwegen",f:"monthly",c:"Business & Growth"},
+  {t:"Financiele rapportage",d:"MRR, kosten (Supabase, API\u2019s, ads), runway",f:"monthly",c:"Business & Growth"},
+  {t:"API & cloud kosten tracking",d:"Kosten per vendor uitsplitsen, unit economics bewaken",f:"monthly",c:"Business & Growth"},
+  {t:"Competitor analyse",d:"Nieuwe features, pricing, markttrends",f:"monthly",c:"Business & Growth"},
+  {t:"Cohort retentie analyse",d:"Retentie per acquisitiekanaal, budget verschuiven",f:"monthly",c:"Business & Growth"},
+  {t:"Partnership mogelijkheden",d:"Integraties met Notion/Obsidian/Slack, podcast-platforms",f:"monthly",c:"Business & Growth"},
+  {t:"GDPR data subject requests",d:"Inzage, correctie, verwijdering \u2014 binnen 30 dagen",f:"monthly",c:"Legal & Compliance"},
+  {t:"App Store & Play Store policy changes",d:"Privacy-eisen, subscription regels, AI-disclosure",f:"monthly",c:"Legal & Compliance"},
+  {t:"RevenueCat configuratie audit",d:"Offerings, trial-lengtes, pricing matchen",f:"monthly",c:"Legal & Compliance"},
+  {t:"Support metrics reviewen",d:"Responstijd, oplossingspercentage, churn-correlatie",f:"monthly",c:"Support & Community"},
+  // quarterly
+  {t:"Content audit \u2014 blogs verversen",d:"Statistieken updaten, broken links, CTA\u2019s reviewen",f:"quarterly",c:"Content & SEO"},
+  {t:"AI model upgrade evalueren",d:"Nieuwe modellen benchmarken, kosten/kwaliteit afwegen",f:"quarterly",c:"Product & Tech"},
+  {t:"Security audit",d:"API keys roteren, RLS policies, dependency vulnerabilities",f:"quarterly",c:"Product & Tech"},
+  {t:"Backup & disaster recovery test",d:"Database restore testen, recovery doorlopen",f:"quarterly",c:"Product & Tech"},
+  {t:"Win-back campagne",d:"Inactieve gebruikers (30+ dagen) targeten",f:"quarterly",c:"Notificaties & Retentie"},
+  {t:"Pricing strategie evalueren",d:"Conversie per plan, trial-duur testen (7/14/30 dagen)",f:"quarterly",c:"Business & Growth"},
+  {t:"OKR / doelen review & planning",d:"Voortgang beoordelen, nieuwe kwartaaldoelen",f:"quarterly",c:"Business & Growth"},
+  {t:"Privacy policy & voorwaarden reviewen",d:"Bijwerken bij nieuwe features, AI-vendors, retentie",f:"quarterly",c:"Legal & Compliance"},
+  {t:"DPA audit leveranciers",d:"Supabase, AssemblyAI, OpenAI, Mollie, RevenueCat, OneSignal",f:"quarterly",c:"Legal & Compliance"},
+  {t:"App privacy declarations verifi\u00EBren",d:"App Store Connect en Play Console klopt met werkelijkheid",f:"quarterly",c:"Legal & Compliance"},
+  {t:"BTW-aangifte indienen",d:"Deadline: laatste werkdag maand na kwartaal",f:"quarterly",c:"Financieel & Fiscaal"},
+  {t:"Belastingvoorziening reserveren",d:"15-20% netto winst apart zetten voor VPB",f:"quarterly",c:"Financieel & Fiscaal"},
+  {t:"Mollie & bank reconciliatie",d:"Uitbetalingen matchen met bankafschriften",f:"quarterly",c:"Financieel & Fiscaal"},
+  // yearly
+  {t:"Jaarrekening & VPB-aangifte",d:"Balans + W&V opstellen, deadline 1 mei. Boekhouder \u20AC500-1000/jr",f:"yearly",c:"Financieel & Fiscaal"},
+];
+
+const FO = {daily:0,weekly:1,biweekly:2,monthly:3,quarterly:4,yearly:5};
+const FL = {daily:"Dagelijks",weekly:"Wekelijks",biweekly:"2-wekelijks",monthly:"Maandelijks",quarterly:"Kwartaal",yearly:"Jaarlijks"};
+const FM = { today:["daily","weekly"], week:["daily","weekly","biweekly"], month:["daily","weekly","biweekly","monthly"], all:["daily","weekly","biweekly","monthly","quarterly","yearly"] };
+
+function renderTasks(filter) {
+  const allowed = FM[filter];
+  const filtered = T.filter(t => allowed.includes(t.f));
+  const el = document.getElementById("tc");
+
+  if (!filtered.length) { el.innerHTML = '<div class="tasks-empty">Geen taken voor deze periode</div>'; return; }
+
+  // Group by category, preserve insertion order
+  const groups = new Map();
+  for (const t of filtered) { if (!groups.has(t.c)) groups.set(t.c, []); groups.get(t.c).push(t); }
+
+  const isSmall = filter === "today" || filter === "week";
+  let html = "";
+  for (const [cat, tasks] of groups) {
+    tasks.sort((a, b) => FO[a.f] - FO[b.f]);
+    html += `<details class="tg" ${isSmall ? "open" : ""}>
+      <summary>${cat}<span class="tg-count">${tasks.length}</span></summary><ul class="tl">`;
+    for (const t of tasks) {
+      html += `<li><div class="bar ${t.f}"></div><span class="freq ${t.f}">${FL[t.f]}</span><div class="tc"><div class="tt">${t.t}</div><div class="td">${t.d}</div></div></li>`;
+    }
+    html += "</ul></details>";
+  }
+  el.innerHTML = html;
 }
 
-function fmt(val, prefix = "", suffix = "") {
-  if (val == null) return "—";
-  const n = typeof val === "string" ? parseFloat(val) : val;
-  if (isNaN(n)) return "—";
-  if (prefix === "€") return `€${n.toLocaleString("nl-NL", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
-  return `${prefix}${n.toLocaleString("en-US")}${suffix}`;
-}
-
-function fmtPct(val) {
-  if (val == null) return "—";
-  const n = typeof val === "string" ? parseFloat(val) : val;
-  if (isNaN(n)) return "—";
-  // GA4 returns bounce rate as 0-1 ratio; multiply by 100 for display
-  const pct = n <= 1 ? n * 100 : n;
-  return `${pct.toFixed(1)}%`;
-}
-
-function pctChange(curr, prev, invertColor = false) {
-  if (curr == null || prev == null || prev === 0) return null;
-  const pct = ((curr - prev) / Math.abs(prev)) * 100;
-  const isUp = pct > 0;
-  const cls = invertColor ? (isUp ? "down" : "up") : (isUp ? "up" : "down");
-  const arrow = isUp ? "\u2191" : "\u2193";
-  return { text: `${arrow} ${Math.abs(pct).toFixed(1)}%`, cls };
-}
+document.querySelectorAll(".filter-tabs button").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".filter-tabs button").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    renderTasks(btn.dataset.f);
+  });
+});
+renderTasks("today");
 </script>
 </body>
 </html>
