@@ -106,10 +106,10 @@ async function fetchRating(email, privateKey, bucket, packageName) {
 async function fetchCrashes(email, privateKey, packageName) {
   const token = await getGoogleAccessToken(email, privateKey, REPORTING_SCOPE);
 
-  // Use proper Date objects to avoid day-of-month boundary issues
+  // Play Reporting API has 2-day data delay ("freshness"). Use 3 days ago → 2 days ago.
   const now = new Date();
-  const end = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
-  const start = new Date(end.getTime() - 86_400_000); // 1 day before end
+  const end = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() - 2));
+  const start = new Date(end.getTime() - 86_400_000);
   const startDate = { year: start.getUTCFullYear(), month: start.getUTCMonth() + 1, day: start.getUTCDate() };
   const endDate = { year: end.getUTCFullYear(), month: end.getUTCMonth() + 1, day: end.getUTCDate() };
 
