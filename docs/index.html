@@ -151,12 +151,12 @@ function renderSummary(rows) {
   const prev = rows.length > 1 ? rows[rows.length - 2] : null;
 
   const cards = [
-    { label: "MRR",           value: fmt(curr.mrr, "$"),           delta: pctChange(curr.mrr, prev?.mrr) },
+    { label: "MRR",           value: fmt(curr.mrr, "€"),           delta: pctChange(curr.mrr, prev?.mrr) },
     { label: "Churn Rate",    value: fmt(curr.churn_rate, "", "%"), delta: pctChange(curr.churn_rate, prev?.churn_rate, true) },
     { label: "New Signups",   value: fmt(curr.new_signups),        delta: pctChange(curr.new_signups, prev?.new_signups) },
     { label: "Active Users",  value: fmt(curr.active_users),       delta: pctChange(curr.active_users, prev?.active_users) },
     { label: "Sessions",      value: fmt(curr.ga4_sessions),       delta: pctChange(curr.ga4_sessions, prev?.ga4_sessions) },
-    { label: "Bounce Rate",   value: fmt(curr.ga4_bounce_rate, "", "%"), delta: pctChange(curr.ga4_bounce_rate, prev?.ga4_bounce_rate, true) },
+    { label: "Bounce Rate",   value: fmtPct(curr.ga4_bounce_rate), delta: pctChange(curr.ga4_bounce_rate, prev?.ga4_bounce_rate, true) },
     { label: "iOS Downloads", value: fmt(curr.ios_downloads),      delta: pctChange(curr.ios_downloads, prev?.ios_downloads) },
     { label: "Android Downloads", value: fmt(curr.android_downloads), delta: pctChange(curr.android_downloads, prev?.android_downloads) },
   ];
@@ -268,8 +268,17 @@ function fmt(val, prefix = "", suffix = "") {
   if (val == null) return "—";
   const n = typeof val === "string" ? parseFloat(val) : val;
   if (isNaN(n)) return "—";
-  if (prefix === "$") return `$${n.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+  if (prefix === "€") return `€${n.toLocaleString("nl-NL", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
   return `${prefix}${n.toLocaleString("en-US")}${suffix}`;
+}
+
+function fmtPct(val) {
+  if (val == null) return "—";
+  const n = typeof val === "string" ? parseFloat(val) : val;
+  if (isNaN(n)) return "—";
+  // GA4 returns bounce rate as 0-1 ratio; multiply by 100 for display
+  const pct = n <= 1 ? n * 100 : n;
+  return `${pct.toFixed(1)}%`;
 }
 
 function pctChange(curr, prev, invertColor = false) {
