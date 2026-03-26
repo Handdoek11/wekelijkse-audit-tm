@@ -9,87 +9,129 @@
   <style>
     :root {
       --ios: #007AFF; --android: #34A853; --revenue: #7C3AED;
-      --sessions: #0D9488; --signups: #F59E0B; --bounce: #EF4444;
+      --sessions: #0D9488; --signups: #F59E0B;
       --bg: #F9FAFB; --card: #FFFFFF; --text: #111827;
       --muted: #6B7280; --border: #E5E7EB;
       --positive: #10B981; --negative: #EF4444;
+      --accent: #3B82F6;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0F172A; --card: #1E293B; --text: #F1F5F9;
+        --muted: #94A3B8; --border: #334155;
+        --positive: #34D399; --negative: #F87171;
+      }
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); padding: 24px; max-width: 1280px; margin: 0 auto; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); padding: 24px; max-width: 1280px; margin: 0 auto; transition: background 0.3s, color 0.3s; }
 
-    header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 24px; }
+    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 8px; }
     header h1 { font-size: 1.5rem; font-weight: 700; }
+    .header-right { display: flex; align-items: center; gap: 12px; }
     header .updated { color: var(--muted); font-size: 0.85rem; }
+    .theme-toggle { background: none; border: 1px solid var(--border); border-radius: 6px; padding: 4px 8px; cursor: pointer; font-size: 1rem; color: var(--text); }
 
     .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 32px; }
     .card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 16px; }
     .card .label { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
     .card .value { font-size: 1.5rem; font-weight: 700; margin: 4px 0; }
     .card .delta { font-size: 0.8rem; font-weight: 500; }
-    .card .delta.up { color: var(--positive); }
-    .card .delta.down { color: var(--negative); }
+    .card .delta.up { color: var(--positive); } .card .delta.down { color: var(--negative); }
 
     .charts { display: grid; grid-template-columns: repeat(auto-fit, minmax(500px, 1fr)); gap: 24px; }
     .chart-box { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 16px; }
     .chart-box h2 { font-size: 0.95rem; font-weight: 600; margin-bottom: 12px; }
     .chart-box canvas { width: 100% !important; height: 280px !important; }
 
-    .error { text-align: center; padding: 80px 20px; color: var(--muted); font-size: 1rem; }
-
+    .error { text-align: center; padding: 80px 20px; color: var(--muted); }
     footer { text-align: center; color: var(--muted); font-size: 0.8rem; margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border); }
 
-    /* ── Tasks: ADHD-friendly ── */
+    /* ── Tasks ── */
     .tasks-section { margin-top: 48px; }
     .tasks-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px; }
     .tasks-header h2 { font-size: 1.25rem; font-weight: 700; margin: 0; }
-    .filter-tabs { display: flex; gap: 6px; }
+    .tasks-toolbar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+    .filter-tabs { display: flex; gap: 4px; }
     .filter-tabs button {
-      padding: 6px 16px; border-radius: 20px; border: 1px solid var(--border);
-      background: var(--card); color: var(--muted); font-size: 0.8rem; font-weight: 500;
+      padding: 6px 14px; border-radius: 20px; border: 1px solid var(--border);
+      background: var(--card); color: var(--muted); font-size: 0.78rem; font-weight: 500;
       cursor: pointer; transition: all 0.15s;
     }
-    .filter-tabs button.active { background: var(--text); color: white; border-color: var(--text); }
+    .filter-tabs button.active { background: var(--text); color: var(--bg); border-color: var(--text); }
     .filter-tabs button:hover:not(.active) { border-color: var(--muted); }
 
-    details.tg {
-      background: var(--card); border: 1px solid var(--border); border-radius: 8px;
-      margin-bottom: 8px; overflow: hidden;
+    .pick-btn {
+      padding: 6px 14px; border-radius: 20px; border: 1px solid var(--accent);
+      background: transparent; color: var(--accent); font-size: 0.78rem; font-weight: 600;
+      cursor: pointer; transition: all 0.2s;
     }
-    details.tg[open] { margin-bottom: 12px; }
+    .pick-btn:hover { background: var(--accent); color: white; }
+
+    /* Progress ring */
+    .progress-card {
+      background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+      padding: 16px 20px; margin-bottom: 12px; display: flex; align-items: center; gap: 16px;
+    }
+    .progress-card svg { flex-shrink: 0; }
+    .progress-card .progress-text { font-size: 0.9rem; }
+    .progress-card .progress-text strong { font-size: 1.1rem; }
+    .progress-card .progress-msg { color: var(--muted); font-size: 0.8rem; margin-top: 2px; }
+
+    /* Picked task highlight */
+    .picked-task {
+      background: var(--card); border: 2px solid var(--accent); border-radius: 8px;
+      padding: 16px 20px; margin-bottom: 12px; display: none; align-items: center; gap: 12px;
+    }
+    .picked-task.show { display: flex; }
+    .picked-task .picked-label { font-size: 0.7rem; text-transform: uppercase; font-weight: 600; color: var(--accent); letter-spacing: 0.05em; }
+    .picked-task .picked-title { font-weight: 600; font-size: 0.95rem; margin-top: 2px; }
+    .picked-task .picked-time { color: var(--muted); font-size: 0.8rem; }
+    .picked-dismiss { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 1.2rem; margin-left: auto; padding: 4px; }
+
+    details.tg { background: var(--card); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 6px; overflow: hidden; }
+    details.tg[open] { margin-bottom: 10px; }
     details.tg summary {
-      display: flex; align-items: center; gap: 10px; padding: 14px 16px;
+      display: flex; align-items: center; gap: 10px; padding: 12px 16px;
       cursor: pointer; font-size: 0.85rem; font-weight: 600; list-style: none; user-select: none;
     }
     details.tg summary::-webkit-details-marker { display: none; }
-    details.tg summary::before { content: "\25B6"; font-size: 0.55rem; color: var(--muted); transition: transform 0.15s; }
+    details.tg summary::before { content: "\25B6"; font-size: 0.5rem; color: var(--muted); transition: transform 0.15s; }
     details.tg[open] summary::before { transform: rotate(90deg); }
-    .tg-count { margin-left: auto; font-size: 0.72rem; font-weight: 400; color: var(--muted); background: var(--bg); padding: 2px 10px; border-radius: 10px; }
+    .tg-count { margin-left: auto; font-size: 0.7rem; color: var(--muted); background: var(--bg); padding: 2px 10px; border-radius: 10px; }
 
-    .tl { list-style: none; padding: 0 16px 12px; }
-    .tl li { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid #F3F4F6; font-size: 0.88rem; }
+    .tl { list-style: none; padding: 0 16px 10px; }
+    .tl li { display: flex; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 0.86rem; transition: opacity 0.2s; }
     .tl li:last-child { border-bottom: none; }
-    .tl .bar { width: 4px; min-height: 28px; border-radius: 2px; flex-shrink: 0; align-self: stretch; }
+    .tl li.done { opacity: 0.4; text-decoration: line-through; }
+
+    .tl .bar { width: 3px; min-height: 24px; border-radius: 2px; flex-shrink: 0; align-self: stretch; }
     .bar.daily { background: #10B981; } .bar.weekly { background: #3B82F6; }
     .bar.biweekly { background: #6366F1; } .bar.monthly { background: #F59E0B; }
     .bar.quarterly { background: #EC4899; } .bar.yearly { background: #8B5CF6; }
 
-    .freq { flex-shrink: 0; font-size: 0.62rem; font-weight: 600; padding: 2px 7px; border-radius: 4px; min-width: 52px; text-align: center; text-transform: uppercase; }
+    .tl input[type=checkbox] { width: 16px; height: 16px; flex-shrink: 0; cursor: pointer; accent-color: var(--positive); }
+
+    .freq { flex-shrink: 0; font-size: 0.6rem; font-weight: 600; padding: 2px 6px; border-radius: 4px; min-width: 48px; text-align: center; text-transform: uppercase; }
     .freq.daily { background: #D1FAE5; color: #065F46; } .freq.weekly { background: #DBEAFE; color: #1D4ED8; }
     .freq.biweekly { background: #E0E7FF; color: #4338CA; } .freq.monthly { background: #FEF3C7; color: #92400E; }
     .freq.quarterly { background: #FCE7F3; color: #9D174D; } .freq.yearly { background: #F3E8FF; color: #6B21A8; }
 
+    .time-badge { flex-shrink: 0; font-size: 0.6rem; color: var(--muted); background: var(--bg); padding: 2px 6px; border-radius: 4px; }
+
     .tc { flex: 1; min-width: 0; }
     .tc .tt { font-weight: 500; }
-    .tc .td { color: var(--muted); font-size: 0.78rem; margin-top: 2px; max-height: 0; overflow: hidden; transition: max-height 0.2s; }
+    .tc .td { color: var(--muted); font-size: 0.76rem; margin-top: 2px; max-height: 0; overflow: hidden; transition: max-height 0.2s; }
     .tl li:hover .td { max-height: 60px; }
 
-    .tasks-empty { text-align: center; padding: 32px; color: var(--muted); font-size: 0.9rem; }
+    .tasks-empty { text-align: center; padding: 32px; color: var(--muted); }
 
     @media (max-width: 600px) {
       .charts { grid-template-columns: 1fr; }
       .cards { grid-template-columns: repeat(2, 1fr); }
       .filter-tabs { width: 100%; }
-      .filter-tabs button { flex: 1; padding: 8px 6px; font-size: 0.75rem; }
+      .filter-tabs button { flex: 1; padding: 8px 4px; font-size: 0.7rem; }
+      .tc .td { max-height: none; } /* Always show descriptions on mobile (no hover) */
     }
   </style>
 </head>
@@ -97,7 +139,10 @@
 
 <header>
   <h1>TalkMark Dashboard</h1>
-  <span class="updated" id="updated"></span>
+  <div class="header-right">
+    <span class="updated" id="updated"></span>
+    <button class="theme-toggle" id="theme-toggle" title="Wissel thema">&#9790;</button>
+  </div>
 </header>
 
 <div id="summary" class="cards"></div>
@@ -107,13 +152,18 @@
 <section class="tasks-section">
   <div class="tasks-header">
     <h2>Taken</h2>
-    <div class="filter-tabs">
-      <button class="active" data-f="today">Vandaag</button>
-      <button data-f="week">Deze week</button>
-      <button data-f="month">Deze maand</button>
-      <button data-f="all">Alles</button>
+    <div class="tasks-toolbar">
+      <div class="filter-tabs">
+        <button class="active" data-f="today">Vandaag</button>
+        <button data-f="week">Deze week</button>
+        <button data-f="month">Deze maand</button>
+        <button data-f="all">Alles</button>
+      </div>
+      <button class="pick-btn" id="pick-btn">Kies voor mij</button>
     </div>
   </div>
+  <div class="picked-task" id="picked"></div>
+  <div class="progress-card" id="progress"></div>
   <div id="tc"></div>
 </section>
 
@@ -125,160 +175,238 @@ const SUPABASE_URL  = "https://uznutxihifijmlgrfime.supabase.co";
 const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV6bnV0eGloaWZpam1sZ3JmaW1lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkyOTY2NTcsImV4cCI6MjA3NDg3MjY1N30.gZBHj-qIyp11FoI6PUGvOtXZglopkh8uz3_JAJERWds";
 const API = `${SUPABASE_URL}/rest/v1/weekly_metrics?apikey=${SUPABASE_ANON}&order=date.asc&limit=90`;
 
-// ── METRICS DASHBOARD ──
+// ── THEME ──
+const themeBtn = document.getElementById("theme-toggle");
+function setTheme(dark) {
+  document.documentElement.style.colorScheme = dark ? "dark" : "light";
+  if (dark) { document.documentElement.style.setProperty("--bg","#0F172A"); document.documentElement.style.setProperty("--card","#1E293B"); document.documentElement.style.setProperty("--text","#F1F5F9"); document.documentElement.style.setProperty("--muted","#94A3B8"); document.documentElement.style.setProperty("--border","#334155"); }
+  else { document.documentElement.style.setProperty("--bg","#F9FAFB"); document.documentElement.style.setProperty("--card","#FFFFFF"); document.documentElement.style.setProperty("--text","#111827"); document.documentElement.style.setProperty("--muted","#6B7280"); document.documentElement.style.setProperty("--border","#E5E7EB"); }
+  themeBtn.textContent = dark ? "\u2600" : "\u263E";
+  localStorage.setItem("theme", dark ? "dark" : "light");
+}
+const savedTheme = localStorage.getItem("theme");
+const prefersDark = savedTheme ? savedTheme === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
+setTheme(prefersDark);
+themeBtn.addEventListener("click", () => setTheme(localStorage.getItem("theme") !== "dark"));
+
+// ── METRICS ──
 const COLORS = { ios: "#007AFF", android: "#34A853", revenue: "#7C3AED", sessions: "#0D9488", signups: "#F59E0B", bounce: "#EF4444" };
 
 (async () => {
   try {
     const res = await fetch(API, { headers: { Accept: "application/json" } });
-    if (!res.ok) throw new Error(`API returned ${res.status}`);
+    if (!res.ok) throw new Error(`API ${res.status}`);
     const rows = await res.json();
-    if (!rows.length) { document.getElementById("error").style.display = "block"; document.getElementById("error").textContent = "No data yet."; return; }
-    renderSummary(rows);
-    renderCharts(rows);
+    if (!rows.length) { document.getElementById("error").style.display = "block"; document.getElementById("error").textContent = "Nog geen data."; return; }
+    renderSummary(rows); renderCharts(rows);
     document.getElementById("updated").textContent = rows[rows.length - 1].date;
-  } catch (err) {
-    document.getElementById("error").style.display = "block";
-    document.getElementById("error").innerHTML = `<strong>Failed to load data</strong><br>${err.message}`;
-  }
+  } catch (err) { document.getElementById("error").style.display = "block"; document.getElementById("error").innerHTML = `<strong>Data laden mislukt</strong><br>${err.message}`; }
 })();
 
 function renderSummary(rows) {
   const c = rows[rows.length - 1], p = rows.length > 1 ? rows[rows.length - 2] : null;
   const cards = [
-    { label: "MRR", value: fmt(c.mrr, "\u20AC"), delta: pctChange(c.mrr, p?.mrr) },
-    { label: "Churn Rate", value: fmt(c.churn_rate, "", "%"), delta: pctChange(c.churn_rate, p?.churn_rate, true) },
-    { label: "New Signups", value: fmt(c.new_signups), delta: pctChange(c.new_signups, p?.new_signups) },
-    { label: "Active Users", value: fmt(c.active_users), delta: pctChange(c.active_users, p?.active_users) },
-    { label: "Sessions", value: fmt(c.ga4_sessions), delta: pctChange(c.ga4_sessions, p?.ga4_sessions) },
-    { label: "Bounce Rate", value: fmtPct(c.ga4_bounce_rate), delta: pctChange(c.ga4_bounce_rate, p?.ga4_bounce_rate, true) },
-    { label: "iOS Downloads", value: fmt(c.ios_downloads), delta: pctChange(c.ios_downloads, p?.ios_downloads) },
-    { label: "Android Downloads", value: fmt(c.android_downloads), delta: pctChange(c.android_downloads, p?.android_downloads) },
+    {l:"MRR",v:fmt(c.mrr,"\u20AC"),d:pctC(c.mrr,p?.mrr)},{l:"Churn",v:fmt(c.churn_rate,"","%"),d:pctC(c.churn_rate,p?.churn_rate,1)},
+    {l:"Signups",v:fmt(c.new_signups),d:pctC(c.new_signups,p?.new_signups)},{l:"Actief",v:fmt(c.active_users),d:pctC(c.active_users,p?.active_users)},
+    {l:"Sessies",v:fmt(c.ga4_sessions),d:pctC(c.ga4_sessions,p?.ga4_sessions)},{l:"Bounce",v:fmtP(c.ga4_bounce_rate),d:pctC(c.ga4_bounce_rate,p?.ga4_bounce_rate,1)},
+    {l:"iOS",v:fmt(c.ios_downloads),d:pctC(c.ios_downloads,p?.ios_downloads)},{l:"Android",v:fmt(c.android_downloads),d:pctC(c.android_downloads,p?.android_downloads)},
   ];
-  document.getElementById("summary").innerHTML = cards.map(c => `<div class="card"><div class="label">${c.label}</div><div class="value">${c.value}</div>${c.delta ? `<div class="delta ${c.delta.cls}">${c.delta.text}</div>` : ""}</div>`).join("");
+  document.getElementById("summary").innerHTML = cards.map(c=>`<div class="card"><div class="label">${c.l}</div><div class="value">${c.v}</div>${c.d?`<div class="delta ${c.d.c}">${c.d.t}</div>`:""}</div>`).join("");
 }
 
 function renderCharts(rows) {
-  const labels = rows.map(r => r.date), el = document.getElementById("charts");
-  const cfgs = [
-    { title: "Sessions & Users", datasets: [ds("Sessions", rows, "ga4_sessions", COLORS.sessions), ds("Users", rows, "ga4_users", COLORS.signups)] },
-    { title: "Downloads", datasets: [ds("iOS", rows, "ios_downloads", COLORS.ios), ds("Android", rows, "android_downloads", COLORS.android)] },
-    { title: "App Ratings", datasets: [ds("iOS", rows, "ios_rating", COLORS.ios), ds("Android", rows, "android_rating", COLORS.android)], yMin: 1, yMax: 5 },
-    { title: "MRR", datasets: [{ ...ds("MRR", rows, "mrr", COLORS.revenue), fill: true, backgroundColor: COLORS.revenue + "20" }] },
-    { title: "Signups", datasets: [ds("Signups", rows, "new_signups", COLORS.signups)], type: "bar" },
-    { title: "Crashes", datasets: [ds("iOS", rows, "ios_crashes", COLORS.ios), ds("Android", rows, "android_crashes", COLORS.android)] },
-  ];
-  for (const cfg of cfgs) {
-    const box = document.createElement("div"); box.className = "chart-box";
-    box.innerHTML = `<h2>${cfg.title}</h2><canvas></canvas>`; el.appendChild(box);
-    new Chart(box.querySelector("canvas"), {
-      type: cfg.type ?? "line", data: { labels, datasets: cfg.datasets },
-      options: { responsive: true, maintainAspectRatio: false, interaction: { mode: "index", intersect: false },
-        plugins: { legend: { position: "bottom" } },
-        scales: { x: { type: "time", time: { unit: "day", tooltipFormat: "MMM dd, yyyy" } }, y: { beginAtZero: cfg.yMin == null, min: cfg.yMin, max: cfg.yMax } } }
-    });
-  }
+  const labels = rows.map(r=>r.date), el = document.getElementById("charts");
+  [{t:"Sessions & Users",ds:[ds("Sessions",rows,"ga4_sessions",COLORS.sessions),ds("Users",rows,"ga4_users",COLORS.signups)]},
+   {t:"Downloads",ds:[ds("iOS",rows,"ios_downloads",COLORS.ios),ds("Android",rows,"android_downloads",COLORS.android)]},
+   {t:"Ratings",ds:[ds("iOS",rows,"ios_rating",COLORS.ios),ds("Android",rows,"android_rating",COLORS.android)],yMin:1,yMax:5},
+   {t:"MRR",ds:[{...ds("MRR",rows,"mrr",COLORS.revenue),fill:true,backgroundColor:COLORS.revenue+"20"}]},
+   {t:"Signups",ds:[ds("Signups",rows,"new_signups",COLORS.signups)],type:"bar"},
+   {t:"Crashes",ds:[ds("iOS",rows,"ios_crashes",COLORS.ios),ds("Android",rows,"android_crashes",COLORS.android)]},
+  ].forEach(cfg=>{
+    const box=document.createElement("div");box.className="chart-box";
+    box.innerHTML=`<h2>${cfg.t}</h2><canvas></canvas>`;el.appendChild(box);
+    new Chart(box.querySelector("canvas"),{type:cfg.type??"line",data:{labels,datasets:cfg.ds},
+      options:{responsive:true,maintainAspectRatio:false,interaction:{mode:"index",intersect:false},
+        plugins:{legend:{position:"bottom"}},
+        scales:{x:{type:"time",time:{unit:"day",tooltipFormat:"MMM dd, yyyy"}},y:{beginAtZero:cfg.yMin==null,min:cfg.yMin,max:cfg.yMax}}}});
+  });
 }
 
-function ds(label, rows, key, color) { return { label, data: rows.map(r => r[key]), borderColor: color, backgroundColor: color, borderWidth: 2, pointRadius: 3, tension: 0.3 }; }
-function fmt(val, pre = "", suf = "") { if (val == null) return "\u2014"; const n = +val; if (isNaN(n)) return "\u2014"; if (pre === "\u20AC") return `\u20AC${n.toLocaleString("nl-NL", { maximumFractionDigits: 0 })}`; return `${pre}${n.toLocaleString("en-US")}${suf}`; }
-function fmtPct(val) { if (val == null) return "\u2014"; const n = +val; if (isNaN(n)) return "\u2014"; return `${(n <= 1 ? n * 100 : n).toFixed(1)}%`; }
-function pctChange(curr, prev, inv = false) { if (curr == null || prev == null || prev === 0) return null; const p = ((curr - prev) / Math.abs(prev)) * 100; const up = p > 0; return { text: `${up ? "\u2191" : "\u2193"} ${Math.abs(p).toFixed(1)}%`, cls: inv ? (up ? "down" : "up") : (up ? "up" : "down") }; }
+function ds(l,r,k,c){return{label:l,data:r.map(r=>r[k]),borderColor:c,backgroundColor:c,borderWidth:2,pointRadius:3,tension:0.3}}
+function fmt(v,p="",s=""){if(v==null)return"\u2014";const n=+v;if(isNaN(n))return"\u2014";if(p==="\u20AC")return`\u20AC${n.toLocaleString("nl-NL",{maximumFractionDigits:0})}`;return`${p}${n.toLocaleString("en-US")}${s}`}
+function fmtP(v){if(v==null)return"\u2014";const n=+v;if(isNaN(n))return"\u2014";return`${(n<=1?n*100:n).toFixed(1)}%`}
+function pctC(c,p,inv){if(c==null||p==null||p===0)return null;const pct=((c-p)/Math.abs(p))*100;const up=pct>0;return{t:`${up?"\u2191":"\u2193"} ${Math.abs(pct).toFixed(1)}%`,c:inv?(up?"down":"up"):(up?"up":"down")}}
 
-// ── RECURRING TASKS (ADHD-friendly: filter by relevance, collapsed groups, hover for details) ──
-const T = [
-  // daily
-  {t:"Support inbox triagen (max 30 min)",d:"Alle berichten binnen 24 uur beantwoorden, terugkerende vragen noteren",f:"daily",c:"Support & Community"},
-  // weekly
-  {t:"Social media post plannen & publiceren",d:"LinkedIn, Instagram, X \u2014 tips, updates en testimonials",f:"weekly",c:"Content & SEO"},
-  {t:"User feedback & reviews doorlezen",d:"App Store, Play Store, support inbox \u2014 patronen signaleren",f:"weekly",c:"Product & Tech"},
-  {t:"API quota & rate limits monitoren",d:"Whisper/AssemblyAI, GPT, Mollie, OneSignal \u2014 alert bij 70%",f:"weekly",c:"Product & Tech"},
-  {t:"Google Ads campagne optimalisatie",d:"Keywords pauzeren, negatieve keywords, budget pacing checken",f:"weekly",c:"Advertising"},
-  {t:"KPI dashboard reviewen",d:"Trends in MRR, churn, signups, sessies analyseren",f:"weekly",c:"Business & Growth"},
-  // biweekly
-  {t:"Nieuwe blogpost schrijven & publiceren",d:"SEO-geoptimaliseerd, 800-1200 woorden, interne links",f:"biweekly",c:"Content & SEO"},
-  {t:"Dependency updates checken",d:"npm audit, Flutter packages, SDK\u2019s (Supabase, RevenueCat, OneSignal)",f:"biweekly",c:"Product & Tech"},
-  {t:"Meta Ads optimalisatie",d:"Frequentie checken, 3-5 nieuwe creatives, lookalike audiences",f:"biweekly",c:"Advertising"},
-  {t:"Push notificatie campagnes (OneSignal)",d:"Onboarding (dag 1-7), feature tips (actief), win-back (inactief)",f:"biweekly",c:"Notificaties & Retentie"},
-  {t:"FAQ & knowledge base uitbreiden",d:"Top 3-5 veelgestelde vragen toevoegen",f:"biweekly",c:"Support & Community"},
-  {t:"Community engagement",d:"Reddit, Indie Hackers, Product Hunt \u2014 TalkMark-mentions monitoren",f:"biweekly",c:"Support & Community"},
-  {t:"Audio retentie & verwijderbeleid controleren",d:"GDPR data minimalisatie \u2014 ruwe audio na retentieperiode verwijderd?",f:"biweekly",c:"Legal & Compliance"},
-  // monthly
-  {t:"ASO review (App Store & Play Store)",d:"Screenshots, beschrijving, keywords updaten",f:"monthly",c:"Content & SEO"},
-  {t:"Keyword research & content gap analyse",d:"Nieuwe zoektermen, concurrenten monitoren",f:"monthly",c:"Content & SEO"},
-  {t:"App release / update uitbrengen",d:"Bugfixes, verbeteringen, release notes",f:"monthly",c:"Product & Tech"},
-  {t:"Performance & crash monitoring",d:"Firebase Crashlytics, laadtijden, API response times",f:"monthly",c:"Product & Tech"},
-  {t:"AI/ML model updates checken",d:"Whisper, AssemblyAI, GPT changelogs \u2014 nieuwe versies, pricing",f:"monthly",c:"Product & Tech"},
-  {t:"Database query performance",d:"Slow queries in Supabase, indexes optimaliseren",f:"monthly",c:"Product & Tech"},
-  {t:"Ads ROI rapportage",d:"CAC en payback period per kanaal berekenen",f:"monthly",c:"Advertising"},
-  {t:"Ad account health check",d:"Spend reconcilen, attributie verifi\u00EBren, campagnes archiveren",f:"monthly",c:"Advertising"},
-  {t:"Conversie-tracking valideren",d:"Google Ads pixels, Meta Pixel, RevenueCat events testen",f:"monthly",c:"Advertising"},
-  {t:"Notificatie opt-out rates analyseren",d:"Frequentie aanpassen bij >5% opt-out",f:"monthly",c:"Notificaties & Retentie"},
-  {t:"User segmenten onderhouden",d:"OneSignal segmenten: actief/inactief/churned drempels bijwerken",f:"monthly",c:"Notificaties & Retentie"},
-  {t:"Churn analyse",d:"Opgezegde gebruikers onderzoeken, win-back overwegen",f:"monthly",c:"Business & Growth"},
-  {t:"Financiele rapportage",d:"MRR, kosten (Supabase, API\u2019s, ads), runway",f:"monthly",c:"Business & Growth"},
-  {t:"API & cloud kosten tracking",d:"Kosten per vendor uitsplitsen, unit economics bewaken",f:"monthly",c:"Business & Growth"},
-  {t:"Competitor analyse",d:"Nieuwe features, pricing, markttrends",f:"monthly",c:"Business & Growth"},
-  {t:"Cohort retentie analyse",d:"Retentie per acquisitiekanaal, budget verschuiven",f:"monthly",c:"Business & Growth"},
-  {t:"Partnership mogelijkheden",d:"Integraties met Notion/Obsidian/Slack, podcast-platforms",f:"monthly",c:"Business & Growth"},
-  {t:"GDPR data subject requests",d:"Inzage, correctie, verwijdering \u2014 binnen 30 dagen",f:"monthly",c:"Legal & Compliance"},
-  {t:"App Store & Play Store policy changes",d:"Privacy-eisen, subscription regels, AI-disclosure",f:"monthly",c:"Legal & Compliance"},
-  {t:"RevenueCat configuratie audit",d:"Offerings, trial-lengtes, pricing matchen",f:"monthly",c:"Legal & Compliance"},
-  {t:"Support metrics reviewen",d:"Responstijd, oplossingspercentage, churn-correlatie",f:"monthly",c:"Support & Community"},
-  // quarterly
-  {t:"Content audit \u2014 blogs verversen",d:"Statistieken updaten, broken links, CTA\u2019s reviewen",f:"quarterly",c:"Content & SEO"},
-  {t:"AI model upgrade evalueren",d:"Nieuwe modellen benchmarken, kosten/kwaliteit afwegen",f:"quarterly",c:"Product & Tech"},
-  {t:"Security audit",d:"API keys roteren, RLS policies, dependency vulnerabilities",f:"quarterly",c:"Product & Tech"},
-  {t:"Backup & disaster recovery test",d:"Database restore testen, recovery doorlopen",f:"quarterly",c:"Product & Tech"},
-  {t:"Win-back campagne",d:"Inactieve gebruikers (30+ dagen) targeten",f:"quarterly",c:"Notificaties & Retentie"},
-  {t:"Pricing strategie evalueren",d:"Conversie per plan, trial-duur testen (7/14/30 dagen)",f:"quarterly",c:"Business & Growth"},
-  {t:"OKR / doelen review & planning",d:"Voortgang beoordelen, nieuwe kwartaaldoelen",f:"quarterly",c:"Business & Growth"},
-  {t:"Privacy policy & voorwaarden reviewen",d:"Bijwerken bij nieuwe features, AI-vendors, retentie",f:"quarterly",c:"Legal & Compliance"},
-  {t:"DPA audit leveranciers",d:"Supabase, AssemblyAI, OpenAI, Mollie, RevenueCat, OneSignal",f:"quarterly",c:"Legal & Compliance"},
-  {t:"App privacy declarations verifi\u00EBren",d:"App Store Connect en Play Console klopt met werkelijkheid",f:"quarterly",c:"Legal & Compliance"},
-  {t:"BTW-aangifte indienen",d:"Deadline: laatste werkdag maand na kwartaal",f:"quarterly",c:"Financieel & Fiscaal"},
-  {t:"Belastingvoorziening reserveren",d:"15-20% netto winst apart zetten voor VPB",f:"quarterly",c:"Financieel & Fiscaal"},
-  {t:"Mollie & bank reconciliatie",d:"Uitbetalingen matchen met bankafschriften",f:"quarterly",c:"Financieel & Fiscaal"},
-  // yearly
-  {t:"Jaarrekening & VPB-aangifte",d:"Balans + W&V opstellen, deadline 1 mei. Boekhouder \u20AC500-1000/jr",f:"yearly",c:"Financieel & Fiscaal"},
+// ── TASKS ──
+const T=[
+  {t:"Support inbox triagen",d:"Alle berichten binnen 24u beantwoorden",f:"daily",c:"Support & Community",m:30},
+  {t:"Social media post",d:"LinkedIn, Instagram, X \u2014 tips, updates, testimonials",f:"weekly",c:"Content & SEO",m:30},
+  {t:"User feedback & reviews",d:"App Store, Play Store, support \u2014 patronen signaleren",f:"weekly",c:"Product & Tech",m:20},
+  {t:"API quota monitoren",d:"Whisper, GPT, Mollie, OneSignal \u2014 alert bij 70%",f:"weekly",c:"Product & Tech",m:10},
+  {t:"Google Ads optimalisatie",d:"Keywords, negatieve keywords, budget pacing",f:"weekly",c:"Advertising",m:45},
+  {t:"KPI dashboard reviewen",d:"MRR, churn, signups, sessies trends",f:"weekly",c:"Business & Growth",m:15},
+  {t:"Blogpost schrijven",d:"SEO-geoptimaliseerd, 800-1200 woorden",f:"biweekly",c:"Content & SEO",m:120},
+  {t:"Dependency updates",d:"npm audit, Flutter packages, SDK\u2019s",f:"biweekly",c:"Product & Tech",m:30},
+  {t:"Meta Ads optimalisatie",d:"Creatives testen, lookalike audiences",f:"biweekly",c:"Advertising",m:30},
+  {t:"Push campagnes (OneSignal)",d:"Onboarding, feature tips, win-back",f:"biweekly",c:"Notificaties & Retentie",m:30},
+  {t:"FAQ uitbreiden",d:"Top 3-5 veelgestelde vragen toevoegen",f:"biweekly",c:"Support & Community",m:30},
+  {t:"Community engagement",d:"Reddit, Indie Hackers, Product Hunt",f:"biweekly",c:"Support & Community",m:20},
+  {t:"Audio retentie check (GDPR)",d:"Ruwe audio na retentieperiode verwijderd?",f:"biweekly",c:"Legal & Compliance",m:15},
+  {t:"ASO review",d:"Screenshots, beschrijving, keywords updaten",f:"monthly",c:"Content & SEO",m:60},
+  {t:"Keyword research",d:"Nieuwe zoektermen, concurrenten monitoren",f:"monthly",c:"Content & SEO",m:45},
+  {t:"App release uitbrengen",d:"Bugfixes, verbeteringen, release notes",f:"monthly",c:"Product & Tech",m:180},
+  {t:"Crash & performance review",d:"Crashlytics, laadtijden, API response times",f:"monthly",c:"Product & Tech",m:30},
+  {t:"AI model updates checken",d:"Whisper, AssemblyAI, GPT changelogs",f:"monthly",c:"Product & Tech",m:20},
+  {t:"Database performance",d:"Slow queries, indexes optimaliseren",f:"monthly",c:"Product & Tech",m:30},
+  {t:"Ads ROI rapportage",d:"CAC en payback period per kanaal",f:"monthly",c:"Advertising",m:30},
+  {t:"Ad account health check",d:"Spend reconcilen, attributie verifi\u00EBren",f:"monthly",c:"Advertising",m:20},
+  {t:"Conversie-tracking valideren",d:"Google Ads, Meta Pixel, RevenueCat events",f:"monthly",c:"Advertising",m:20},
+  {t:"Notificatie opt-out analyse",d:"Frequentie aanpassen bij >5% opt-out",f:"monthly",c:"Notificaties & Retentie",m:15},
+  {t:"User segmenten onderhouden",d:"OneSignal drempels bijwerken",f:"monthly",c:"Notificaties & Retentie",m:15},
+  {t:"Churn analyse",d:"Opgezegde gebruikers onderzoeken",f:"monthly",c:"Business & Growth",m:30},
+  {t:"Financiele rapportage",d:"MRR, kosten, runway berekening",f:"monthly",c:"Business & Growth",m:45},
+  {t:"Cloud kosten tracking",d:"Kosten per vendor, unit economics",f:"monthly",c:"Business & Growth",m:20},
+  {t:"Competitor analyse",d:"Features, pricing, markttrends",f:"monthly",c:"Business & Growth",m:30},
+  {t:"Cohort retentie analyse",d:"Retentie per kanaal, budget verschuiven",f:"monthly",c:"Business & Growth",m:30},
+  {t:"Partnership verkennen",d:"Notion, Obsidian, Slack, podcast-platforms",f:"monthly",c:"Business & Growth",m:20},
+  {t:"GDPR data requests",d:"Inzage, verwijdering \u2014 binnen 30 dagen",f:"monthly",c:"Legal & Compliance",m:15},
+  {t:"Store policy changes",d:"Privacy, subscriptions, AI-disclosure",f:"monthly",c:"Legal & Compliance",m:15},
+  {t:"RevenueCat audit",d:"Offerings, trial-lengtes, pricing matchen",f:"monthly",c:"Legal & Compliance",m:15},
+  {t:"Support metrics",d:"Responstijd, oplossingspercentage",f:"monthly",c:"Support & Community",m:15},
+  {t:"Content audit",d:"Blogs verversen, broken links, CTA\u2019s",f:"quarterly",c:"Content & SEO",m:120},
+  {t:"AI model upgrade evalueren",d:"Benchmarken, kosten/kwaliteit afwegen",f:"quarterly",c:"Product & Tech",m:60},
+  {t:"Security audit",d:"API keys roteren, RLS, vulnerabilities",f:"quarterly",c:"Product & Tech",m:60},
+  {t:"Backup & recovery test",d:"Database restore, recovery doorlopen",f:"quarterly",c:"Product & Tech",m:30},
+  {t:"Win-back campagne",d:"Inactieve gebruikers (30+ dagen)",f:"quarterly",c:"Notificaties & Retentie",m:45},
+  {t:"Pricing evalueren",d:"Conversie per plan, trial-duur testen",f:"quarterly",c:"Business & Growth",m:60},
+  {t:"OKR review & planning",d:"Voortgang, nieuwe kwartaaldoelen",f:"quarterly",c:"Business & Growth",m:60},
+  {t:"Privacy policy reviewen",d:"Bijwerken bij nieuwe features/vendors",f:"quarterly",c:"Legal & Compliance",m:30},
+  {t:"DPA audit leveranciers",d:"Supabase, AssemblyAI, OpenAI, Mollie etc.",f:"quarterly",c:"Legal & Compliance",m:30},
+  {t:"Privacy declarations check",d:"App Store Connect + Play Console",f:"quarterly",c:"Legal & Compliance",m:20},
+  {t:"BTW-aangifte",d:"Deadline: laatste werkdag maand na kwartaal",f:"quarterly",c:"Financieel & Fiscaal",m:60},
+  {t:"Belastingvoorziening",d:"15-20% netto winst apart zetten",f:"quarterly",c:"Financieel & Fiscaal",m:15},
+  {t:"Mollie & bank reconciliatie",d:"Uitbetalingen matchen met bank",f:"quarterly",c:"Financieel & Fiscaal",m:30},
+  {t:"Jaarrekening & VPB-aangifte",d:"Balans + W&V, deadline 1 mei",f:"yearly",c:"Financieel & Fiscaal",m:240},
 ];
 
-const FO = {daily:0,weekly:1,biweekly:2,monthly:3,quarterly:4,yearly:5};
-const FL = {daily:"Dagelijks",weekly:"Wekelijks",biweekly:"2-wekelijks",monthly:"Maandelijks",quarterly:"Kwartaal",yearly:"Jaarlijks"};
-const FM = { today:["daily","weekly"], week:["daily","weekly","biweekly"], month:["daily","weekly","biweekly","monthly"], all:["daily","weekly","biweekly","monthly","quarterly","yearly"] };
+const FO={daily:0,weekly:1,biweekly:2,monthly:3,quarterly:4,yearly:5};
+const FL={daily:"Dagelijks",weekly:"Wekelijks",biweekly:"2-Wekelijks",monthly:"Maandelijks",quarterly:"Kwartaal",yearly:"Jaarlijks"};
+const FM={today:["daily","weekly"],week:["daily","weekly","biweekly"],month:["daily","weekly","biweekly","monthly"],all:["daily","weekly","biweekly","monthly","quarterly","yearly"]};
+
+// LocalStorage for completed tasks (reset daily)
+const TODAY_KEY = "tm_done_" + new Date().toISOString().slice(0,10);
+function getDone() { try { return JSON.parse(localStorage.getItem(TODAY_KEY)) || []; } catch { return []; } }
+function setDone(arr) { localStorage.setItem(TODAY_KEY, JSON.stringify(arr)); }
+
+let currentFilter = "today";
 
 function renderTasks(filter) {
+  currentFilter = filter;
   const allowed = FM[filter];
   const filtered = T.filter(t => allowed.includes(t.f));
   const el = document.getElementById("tc");
+  const done = getDone();
 
-  if (!filtered.length) { el.innerHTML = '<div class="tasks-empty">Geen taken voor deze periode</div>'; return; }
+  if (!filtered.length) { el.innerHTML = '<div class="tasks-empty">Geen taken</div>'; renderProgress(0,0); return; }
 
-  // Group by category, preserve insertion order
   const groups = new Map();
   for (const t of filtered) { if (!groups.has(t.c)) groups.set(t.c, []); groups.get(t.c).push(t); }
 
   const isSmall = filter === "today" || filter === "week";
   let html = "";
+  let idx = 0;
   for (const [cat, tasks] of groups) {
-    tasks.sort((a, b) => FO[a.f] - FO[b.f]);
+    tasks.sort((a,b) => FO[a.f] - FO[b.f]);
+    const catDone = tasks.filter(t => done.includes(T.indexOf(t))).length;
     html += `<details class="tg" ${isSmall ? "open" : ""}>
-      <summary>${cat}<span class="tg-count">${tasks.length}</span></summary><ul class="tl">`;
+      <summary>${cat}<span class="tg-count">${catDone}/${tasks.length}</span></summary><ul class="tl">`;
     for (const t of tasks) {
-      html += `<li><div class="bar ${t.f}"></div><span class="freq ${t.f}">${FL[t.f]}</span><div class="tc"><div class="tt">${t.t}</div><div class="td">${t.d}</div></div></li>`;
+      const i = T.indexOf(t);
+      const checked = done.includes(i);
+      const timeLabel = t.m >= 60 ? `${Math.round(t.m/60)}u` : `${t.m}m`;
+      html += `<li class="${checked?"done":""}">
+        <div class="bar ${t.f}"></div>
+        <input type="checkbox" data-i="${i}" ${checked?"checked":""}>
+        <span class="freq ${t.f}">${FL[t.f]}</span>
+        <span class="time-badge">${timeLabel}</span>
+        <div class="tc"><div class="tt">${t.t}</div><div class="td">${t.d}</div></div>
+      </li>`;
     }
     html += "</ul></details>";
   }
   el.innerHTML = html;
+
+  // Checkbox handlers
+  el.querySelectorAll("input[type=checkbox]").forEach(cb => {
+    cb.addEventListener("change", () => {
+      const i = +cb.dataset.i;
+      const d = getDone();
+      if (cb.checked) { d.push(i); cb.closest("li").classList.add("done"); }
+      else { d.splice(d.indexOf(i), 1); cb.closest("li").classList.remove("done"); }
+      setDone(d);
+      updateProgress();
+      updateCounts();
+    });
+  });
+
+  renderProgress(done.filter(i => filtered.includes(T[i])).length, filtered.length);
 }
 
+function updateProgress() {
+  const allowed = FM[currentFilter];
+  const filtered = T.filter(t => allowed.includes(t.f));
+  const done = getDone();
+  const count = done.filter(i => filtered.includes(T[i])).length;
+  renderProgress(count, filtered.length);
+}
+
+function updateCounts() {
+  const done = getDone();
+  document.querySelectorAll("details.tg").forEach(det => {
+    const items = det.querySelectorAll("input[type=checkbox]");
+    const checked = [...items].filter(cb => cb.checked).length;
+    det.querySelector(".tg-count").textContent = `${checked}/${items.length}`;
+  });
+}
+
+function renderProgress(count, total) {
+  const pct = total ? Math.round((count / total) * 100) : 0;
+  const r = 20, circ = 2 * Math.PI * r, offset = circ - (pct / 100) * circ;
+  const color = pct === 100 ? "var(--positive)" : "var(--accent)";
+  const msgs = pct === 100 ? "Alles gedaan! Goed bezig." : pct >= 50 ? "Lekker op schema." : "Begin met de makkelijkste.";
+  document.getElementById("progress").innerHTML = `
+    <svg width="48" height="48" viewBox="0 0 48 48">
+      <circle cx="24" cy="24" r="${r}" fill="none" stroke="var(--border)" stroke-width="4"/>
+      <circle cx="24" cy="24" r="${r}" fill="none" stroke="${color}" stroke-width="4" stroke-linecap="round"
+        stroke-dasharray="${circ}" stroke-dashoffset="${offset}" transform="rotate(-90 24 24)" style="transition:stroke-dashoffset 0.4s"/>
+      <text x="24" y="26" text-anchor="middle" font-size="11" font-weight="600" fill="var(--text)">${pct}%</text>
+    </svg>
+    <div class="progress-text"><strong>${count} van ${total}</strong> taken afgevinkt<div class="progress-msg">${msgs}</div></div>`;
+}
+
+// "Kies voor mij" — random uncompleted task
+document.getElementById("pick-btn").addEventListener("click", () => {
+  const allowed = FM[currentFilter];
+  const done = getDone();
+  const available = T.filter((t, i) => allowed.includes(t.f) && !done.includes(i));
+  const el = document.getElementById("picked");
+  if (!available.length) { el.className = "picked-task show"; el.innerHTML = '<div><div class="picked-label">Alles gedaan!</div><div class="picked-title">Er zijn geen open taken meer. Goed bezig!</div></div>'; return; }
+  const pick = available[Math.floor(Math.random() * available.length)];
+  const timeLabel = pick.m >= 60 ? `${Math.round(pick.m/60)} uur` : `${pick.m} min`;
+  el.className = "picked-task show";
+  el.innerHTML = `<div><div class="picked-label">Begin hiermee</div><div class="picked-title">${pick.t}</div><div class="picked-time">${timeLabel} \u2022 ${pick.c}</div></div><button class="picked-dismiss" onclick="this.parentElement.classList.remove('show')">\u2715</button>`;
+});
+
+// Filter tabs
 document.querySelectorAll(".filter-tabs button").forEach(btn => {
   btn.addEventListener("click", () => {
     document.querySelectorAll(".filter-tabs button").forEach(b => b.classList.remove("active"));
     btn.classList.add("active");
     renderTasks(btn.dataset.f);
+    document.getElementById("picked").classList.remove("show");
   });
 });
+
 renderTasks("today");
 </script>
 </body>
