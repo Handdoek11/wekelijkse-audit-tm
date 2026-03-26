@@ -106,17 +106,12 @@ async function fetchRating(email, privateKey, bucket, packageName) {
 async function fetchCrashes(email, privateKey, packageName) {
   const token = await getGoogleAccessToken(email, privateKey, REPORTING_SCOPE);
 
+  // Use proper Date objects to avoid day-of-month boundary issues
   const now = new Date();
-  const endDate = {
-    year: now.getUTCFullYear(),
-    month: now.getUTCMonth() + 1,
-    day: now.getUTCDate() - 1,
-  };
-  const startDate = {
-    year: now.getUTCFullYear(),
-    month: now.getUTCMonth() + 1,
-    day: now.getUTCDate() - 1,
-  };
+  const end = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+  const start = new Date(end.getTime() - 86_400_000); // 1 day before end
+  const startDate = { year: start.getUTCFullYear(), month: start.getUTCMonth() + 1, day: start.getUTCDate() };
+  const endDate = { year: end.getUTCFullYear(), month: end.getUTCMonth() + 1, day: end.getUTCDate() };
 
   const res = await fetch(
     `https://playdeveloperreporting.googleapis.com/v1beta1/apps/${packageName}/crashRateMetricSet:query`,
