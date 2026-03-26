@@ -126,6 +126,13 @@
 
     .tasks-empty { text-align: center; padding: 32px; color: var(--muted); }
 
+    .deadline-banner { background: #FEF3C7; border: 1px solid #F59E0B; border-radius: 8px; padding: 12px 16px; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; font-size: 0.85rem; }
+    .deadline-banner .dl-icon { font-size: 1.1rem; flex-shrink: 0; }
+    .deadline-banner .dl-text { flex: 1; }
+    .deadline-banner .dl-text strong { font-weight: 600; }
+    .deadline-banner .dl-days { font-size: 0.75rem; color: #92400E; font-weight: 600; }
+    @media (prefers-color-scheme: dark) { .deadline-banner { background: #422006; border-color: #92400E; } .deadline-banner .dl-days { color: #FCD34D; } }
+
     @media (max-width: 600px) {
       .charts { grid-template-columns: 1fr; }
       .cards { grid-template-columns: repeat(2, 1fr); }
@@ -162,6 +169,7 @@
       <button class="pick-btn" id="pick-btn">Kies voor mij</button>
     </div>
   </div>
+  <div id="deadlines"></div>
   <div class="picked-task" id="picked"></div>
   <div class="progress-card" id="progress"></div>
   <div id="tc"></div>
@@ -408,6 +416,43 @@ document.querySelectorAll(".filter-tabs button").forEach(btn => {
 });
 
 renderTasks("today");
+
+// ── DEADLINE ALERTS ──
+// Deadlines die je kunt vergeten. BTW = laatste werkdag maand na kwartaaleinde.
+// Format: { label, date: "MM-DD", warn: dagen vooraf om te waarschuwen }
+const DEADLINES = [
+  { label: "BTW-aangifte Q1", date: "04-30", warn: 14 },
+  { label: "BTW-aangifte Q2", date: "07-31", warn: 14 },
+  { label: "BTW-aangifte Q3", date: "10-31", warn: 14 },
+  { label: "BTW-aangifte Q4", date: "01-31", warn: 14 },
+  { label: "Jaarrekening & VPB-aangifte indienen", date: "05-01", warn: 30 },
+];
+
+function renderDeadlines() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const el = document.getElementById("deadlines");
+  let html = "";
+
+  for (const dl of DEADLINES) {
+    const [mm, dd] = dl.date.split("-").map(Number);
+    // Try this year first, then next year
+    let target = new Date(year, mm - 1, dd);
+    if (target < now) target = new Date(year + 1, mm - 1, dd);
+
+    const diffDays = Math.ceil((target - now) / 86400000);
+    if (diffDays <= dl.warn && diffDays >= 0) {
+      const urgency = diffDays <= 3 ? "Vandaag!" : diffDays <= 7 ? `Nog ${diffDays} dagen` : `Over ${diffDays} dagen`;
+      html += `<div class="deadline-banner">
+        <span class="dl-icon">\u26A0</span>
+        <div class="dl-text"><strong>${dl.label}</strong> \u2014 deadline ${target.toLocaleDateString("nl-NL", { day: "numeric", month: "long" })}</div>
+        <span class="dl-days">${urgency}</span>
+      </div>`;
+    }
+  }
+  el.innerHTML = html;
+}
+renderDeadlines();
 </script>
 </body>
 </html>
