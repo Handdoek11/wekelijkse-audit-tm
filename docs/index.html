@@ -103,7 +103,7 @@
 <div id="charts" class="charts"></div>
 <div id="error" class="error" style="display:none"></div>
 
-<footer>Data collected automatically every Monday via GitHub Actions</footer>
+<footer>Data collected automatically every day at 06:00 UTC via GitHub Actions</footer>
 
 <script>
 // ============================================================
@@ -113,7 +113,7 @@ const SUPABASE_URL  = "https://uznutxihifijmlgrfime.supabase.co";
 const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV6bnV0eGloaWZpam1sZ3JmaW1lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkyOTY2NTcsImV4cCI6MjA3NDg3MjY1N30.gZBHj-qIyp11FoI6PUGvOtXZglopkh8uz3_JAJERWds";
 // ============================================================
 
-const API = `${SUPABASE_URL}/rest/v1/weekly_metrics?apikey=${SUPABASE_ANON}&order=week_start.asc&limit=52`;
+const API = `${SUPABASE_URL}/rest/v1/weekly_metrics?apikey=${SUPABASE_ANON}&order=date.asc&limit=90`;
 
 const COLORS = {
   ios: "#007AFF", android: "#34A853", revenue: "#7C3AED",
@@ -136,7 +136,7 @@ const COLORS = {
     renderCharts(rows);
 
     const latest = rows[rows.length - 1];
-    document.getElementById("updated").textContent = `Week of ${latest.week_start}`;
+    document.getElementById("updated").textContent = `${latest.date}`;
   } catch (err) {
     document.getElementById("error").style.display = "block";
     document.getElementById("error").innerHTML =
@@ -174,7 +174,7 @@ function renderSummary(rows) {
 // ── Charts ─────────────────────────────────────────────────
 
 function renderCharts(rows) {
-  const labels = rows.map((r) => r.week_start);
+  const labels = rows.map((r) => r.date);
   const container = document.getElementById("charts");
 
   const charts = [
@@ -237,7 +237,7 @@ function renderCharts(rows) {
         scales: {
           x: {
             type: "time",
-            time: { unit: "week", tooltipFormat: "MMM dd, yyyy" },
+            time: { unit: "day", tooltipFormat: "MMM dd, yyyy" },
           },
           y: {
             beginAtZero: cfg.yMin == null,

@@ -1,8 +1,8 @@
-name: Weekly TalkMark Audit
+name: Daily TalkMark Audit
 
 on:
   schedule:
-    - cron: '0 9 * * 1'  # Monday 9 AM UTC
+    - cron: '0 6 * * *'  # Every day 6 AM UTC
   workflow_dispatch: {}    # Manual trigger for testing
 
 jobs:
@@ -18,7 +18,7 @@ jobs:
 
       - run: npm ci
 
-      - name: Collect weekly metrics
+      - name: Collect daily metrics
         run: node scripts/collect-all.js
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
@@ -46,7 +46,7 @@ jobs:
             await github.rest.issues.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              title: `Weekly audit failed — ${date}`,
-              body: `The weekly metrics collection failed.\n\n[View run logs](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})`,
+              title: `Daily audit failed — ${date}`,
+              body: `The daily metrics collection failed.\n\n[View run logs](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})`,
               labels: ['bug', 'audit']
             });

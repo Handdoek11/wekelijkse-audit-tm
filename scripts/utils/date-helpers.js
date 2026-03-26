@@ -1,13 +1,10 @@
 /**
- * Returns the Monday of the current week as YYYY-MM-DD (UTC).
+ * Returns today's date as YYYY-MM-DD (UTC).
  * @returns {string}
  */
-export function getWeekStart() {
+export function getToday() {
   const now = new Date();
-  const day = now.getUTCDay(); // 0=Sun, 1=Mon, ...
-  const diff = day === 0 ? 6 : day - 1; // days since Monday
-  const monday = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() - diff));
-  return formatDate(monday);
+  return formatDate(new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())));
 }
 
 /**

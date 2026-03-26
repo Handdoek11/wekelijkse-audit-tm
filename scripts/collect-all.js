@@ -1,5 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
-import { getWeekStart } from "./utils/date-helpers.js";
+import { getToday } from "./utils/date-helpers.js";
 import { logger } from "./utils/logger.js";
 import collectGA4 from "./collectors/ga4.js";
 import collectGooglePlay from "./collectors/google-play.js";
@@ -9,7 +9,7 @@ import collectSupabaseInternal from "./collectors/supabase-internal.js";
 const DRY_RUN = process.env.DRY_RUN === "true";
 
 async function main() {
-  const weekStart = getWeekStart();
+  const weekStart = getToday();
   logger.info(`Collecting metrics for week starting ${weekStart}`);
 
   // Run all four collectors in parallel — each failure is isolated
@@ -38,7 +38,7 @@ async function main() {
 
   // Merge results into a single row
   const row = {
-    week_start: weekStart,
+    date: weekStart,
     ...(ga4 ?? {}),
     ...(play ?? {}),
     ...(apple ?? {}),
@@ -51,7 +51,7 @@ async function main() {
     return;
   }
 
-  // Upsert into Supabase (idempotent on week_start)
+  // Upsert into Supabase (idempotent on date)
   const supabase = createClient(
     process.env.SUPABASE_URL,
     process.env.SUPABASE_SERVICE_KEY,
@@ -60,7 +60,7 @@ async function main() {
 
   const { error } = await supabase
     .from("weekly_metrics")
-    .upsert(row, { onConflict: "week_start" });
+    .upsert(row, { onConflict: "date" });
 
   if (error) {
     logger.error(`Supabase upsert failed: ${error.message}`, "orchestrator");

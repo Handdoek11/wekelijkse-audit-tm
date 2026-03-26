@@ -57,7 +57,7 @@ export default async function collectAppStore() {
  * @returns {Promise<number>}
  */
 async function fetchDownloads(token, vendorNumber) {
-  const days = getLastNDays(7);
+  const days = getLastNDays(1);
   let totalUnits = 0;
 
   for (const day of days) {

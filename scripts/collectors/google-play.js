@@ -68,8 +68,8 @@ async function fetchDownloads(email, privateKey, bucket, packageName) {
   }
 
   const dataRows = rows.slice(1).filter((r) => r.length > installIdx);
-  const last7 = dataRows.slice(-7);
-  return last7.reduce((sum, row) => sum + (parseInt(row[installIdx], 10) || 0), 0);
+  const lastDay = dataRows.slice(-1);
+  return lastDay.reduce((sum, row) => sum + (parseInt(row[installIdx], 10) || 0), 0);
 }
 
 /**
@@ -115,7 +115,7 @@ async function fetchCrashes(email, privateKey, packageName) {
   const startDate = {
     year: now.getUTCFullYear(),
     month: now.getUTCMonth() + 1,
-    day: now.getUTCDate() - 7,
+    day: now.getUTCDate() - 1,
   };
 
   const res = await fetch(

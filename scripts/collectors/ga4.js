@@ -39,7 +39,7 @@ export default async function collectGA4() {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        dateRanges: [{ startDate: "7daysAgo", endDate: "yesterday" }],
+        dateRanges: [{ startDate: "yesterday", endDate: "yesterday" }],
         dimensions: [{ name: "sessionDefaultChannelGrouping" }],
         metrics: [
           { name: "sessions" },

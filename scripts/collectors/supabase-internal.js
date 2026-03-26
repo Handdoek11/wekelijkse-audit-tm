@@ -52,7 +52,7 @@ export default async function collectSupabaseInternal() {
     auth: { autoRefreshToken: false, persistSession: false },
   });
 
-  const { startDate } = getDateRange(7);
+  const { startDate } = getDateRange(1);
 
   const [mrr, churn, signups, active] = await Promise.allSettled([
     fetchMRR(supabase),
