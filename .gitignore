@@ -1,0 +1,5 @@
+node_modules/
+.env
+*.p8
+*-credentials.json
+service-account*.json

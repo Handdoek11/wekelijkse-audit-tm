@@ -1,0 +1,17 @@
+{
+  "name": "wekelijkse-audit-tm",
+  "version": "1.0.0",
+  "description": "Automated weekly SaaS audit pipeline for TalkMark",
+  "type": "module",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "collect": "node scripts/collect-all.js",
+    "collect:dry-run": "DRY_RUN=true node scripts/collect-all.js"
+  },
+  "dependencies": {
+    "jose": "^5.9.0",
+    "@supabase/supabase-js": "^2.49.0"
+  }
+}
