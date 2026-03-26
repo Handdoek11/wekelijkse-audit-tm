@@ -110,7 +110,9 @@
     .freq.weekly { background: #DBEAFE; color: #1D4ED8; }
     .freq.biweekly { background: #E0E7FF; color: #4338CA; }
     .freq.monthly { background: #FEF3C7; color: #92400E; }
+    .freq.daily { background: #D1FAE5; color: #065F46; }
     .freq.quarterly { background: #FCE7F3; color: #9D174D; }
+    .freq.yearly { background: #F3E8FF; color: #6B21A8; }
     .task-text { flex: 1; }
     .task-text .desc { color: var(--muted); font-size: 0.8rem; }
 
@@ -149,11 +151,35 @@
     <h3>Product & Tech</h3>
     <ul class="task-list">
       <li><span class="freq weekly">Wekelijks</span><div class="task-text">User feedback & reviews doorlezen<div class="desc">App Store, Play Store, support inbox — patronen signaleren</div></div></li>
-      <li><span class="freq biweekly">2-wekelijks</span><div class="task-text">Dependency updates checken<div class="desc">npm audit, Flutter packages, security advisories</div></div></li>
+      <li><span class="freq weekly">Wekelijks</span><div class="task-text">API quota & rate limits monitoren<div class="desc">Whisper/AssemblyAI, GPT, Mollie, OneSignal — alerts bij 70% van limiet</div></div></li>
+      <li><span class="freq biweekly">2-wekelijks</span><div class="task-text">Dependency updates checken<div class="desc">npm audit, Flutter pub.dev packages, SDK's (Supabase, RevenueCat, OneSignal)</div></div></li>
       <li><span class="freq monthly">Maandelijks</span><div class="task-text">App release / update uitbrengen<div class="desc">Bugfixes, kleine verbeteringen, release notes schrijven</div></div></li>
-      <li><span class="freq monthly">Maandelijks</span><div class="task-text">Performance & crash monitoring review<div class="desc">Firebase Crashlytics, laadtijden, API response times</div></div></li>
+      <li><span class="freq monthly">Maandelijks</span><div class="task-text">Performance & crash monitoring review<div class="desc">Firebase Crashlytics, laadtijden, API response times, app startup &lt; 2s</div></div></li>
+      <li><span class="freq monthly">Maandelijks</span><div class="task-text">AI/ML model updates checken<div class="desc">Whisper, AssemblyAI, GPT changelogs — nieuwe versies, pricing, kwaliteitsverbeteringen</div></div></li>
+      <li><span class="freq monthly">Maandelijks</span><div class="task-text">Database query performance analyse<div class="desc">Slow queries identificeren in Supabase, indexes optimaliseren, p99 &lt; 500ms</div></div></li>
+      <li><span class="freq quarterly">Kwartaal</span><div class="task-text">AI model upgrade evalueren & testen<div class="desc">Nieuwe modellen benchmarken tegen huidige setup, kosten/kwaliteit afwegen</div></div></li>
       <li><span class="freq quarterly">Kwartaal</span><div class="task-text">Security audit<div class="desc">API keys roteren, RLS policies reviewen, dependency vulnerabilities</div></div></li>
       <li><span class="freq quarterly">Kwartaal</span><div class="task-text">Backup & disaster recovery test<div class="desc">Database restore testen, recovery procedure doorlopen</div></div></li>
+    </ul>
+  </div>
+
+  <div class="task-group">
+    <h3>Advertising & Acquisitie</h3>
+    <ul class="task-list">
+      <li><span class="freq weekly">Wekelijks</span><div class="task-text">Google Ads campagne optimalisatie<div class="desc">Ondermaatse keywords pauzeren, negatieve keywords toevoegen, budget pacing checken</div></div></li>
+      <li><span class="freq biweekly">2-wekelijks</span><div class="task-text">Meta Ads optimalisatie<div class="desc">Frequentie checken (max 4-6x/week), 3-5 nieuwe creatives testen, lookalike audiences</div></div></li>
+      <li><span class="freq monthly">Maandelijks</span><div class="task-text">Ads ROI rapportage<div class="desc">CAC en payback period per kanaal berekenen, best presterende cohorten identificeren</div></div></li>
+      <li><span class="freq monthly">Maandelijks</span><div class="task-text">Ad account health check<div class="desc">Spend reconcilen met Mollie, attributie-accuracy verifiëren, oude campagnes archiveren</div></div></li>
+    </ul>
+  </div>
+
+  <div class="task-group">
+    <h3>Notificaties & Retentie</h3>
+    <ul class="task-list">
+      <li><span class="freq biweekly">2-wekelijks</span><div class="task-text">Push notificatie campagnes plannen (OneSignal)<div class="desc">Onboarding (dag 1-7), feature tips (actief), win-back (inactief) — max 2-3/week</div></div></li>
+      <li><span class="freq monthly">Maandelijks</span><div class="task-text">Notificatie opt-out rates analyseren<div class="desc">Spike = te veel verstuurd. Frequentie/content aanpassen bij &gt;5% opt-out</div></div></li>
+      <li><span class="freq monthly">Maandelijks</span><div class="task-text">User segmenten onderhouden<div class="desc">OneSignal segmenten reviewen: actief/inactief/churned drempels bijwerken</div></div></li>
+      <li><span class="freq quarterly">Kwartaal</span><div class="task-text">Win-back campagne voor inactieve gebruikers<div class="desc">Gebruikers 30+ dagen inactief targeten met speciale aanbieding of nieuwe feature</div></div></li>
     </ul>
   </div>
 
@@ -162,10 +188,46 @@
     <ul class="task-list">
       <li><span class="freq weekly">Wekelijks</span><div class="task-text">KPI dashboard reviewen<div class="desc">Trends in MRR, churn, signups, sessies analyseren</div></div></li>
       <li><span class="freq monthly">Maandelijks</span><div class="task-text">Churn analyse — opgezegde gebruikers onderzoeken<div class="desc">Redenen achterhalen, win-back email overwegen</div></div></li>
-      <li><span class="freq monthly">Maandelijks</span><div class="task-text">Financiele rapportage<div class="desc">MRR ontwikkeling, kosten overzicht, runway berekening</div></div></li>
+      <li><span class="freq monthly">Maandelijks</span><div class="task-text">Financiele rapportage<div class="desc">MRR ontwikkeling, kosten overzicht (Supabase, API's, ads), runway berekening</div></div></li>
+      <li><span class="freq monthly">Maandelijks</span><div class="task-text">API & cloud kosten tracking<div class="desc">Kosten per vendor uitsplitsen: AssemblyAI, GPT, Mollie, Supabase, ads — unit economics bewaken</div></div></li>
       <li><span class="freq monthly">Maandelijks</span><div class="task-text">Competitor analyse<div class="desc">Nieuwe features, pricing changes, markttrends monitoren</div></div></li>
-      <li><span class="freq quarterly">Kwartaal</span><div class="task-text">Pricing strategie evalueren<div class="desc">Conversie per plan, willingness-to-pay, eventuele aanpassingen</div></div></li>
+      <li><span class="freq monthly">Maandelijks</span><div class="task-text">Cohort retentie analyse<div class="desc">Retentie per acquisitiekanaal vergelijken, budget verschuiven naar beste kanalen</div></div></li>
+      <li><span class="freq monthly">Maandelijks</span><div class="task-text">Partnership mogelijkheden verkennen<div class="desc">Integraties met Notion/Obsidian/Slack, samenwerkingen met podcast-platforms</div></div></li>
+      <li><span class="freq quarterly">Kwartaal</span><div class="task-text">Pricing strategie evalueren<div class="desc">Conversie per plan, willingness-to-pay, trial-duur testen (7 vs 14 vs 30 dagen)</div></div></li>
       <li><span class="freq quarterly">Kwartaal</span><div class="task-text">OKR / doelen review & planning<div class="desc">Voortgang beoordelen, nieuwe doelen stellen voor volgend kwartaal</div></div></li>
+    </ul>
+  </div>
+
+  <div class="task-group">
+    <h3>Legal & Compliance (GDPR / EU)</h3>
+    <ul class="task-list">
+      <li><span class="freq biweekly">2-wekelijks</span><div class="task-text">Audio retentie & verwijderbeleid controleren<div class="desc">Verifieer dat ruwe audio na retentieperiode verwijderd wordt, GDPR data minimalisatie</div></div></li>
+      <li><span class="freq monthly">Maandelijks</span><div class="task-text">GDPR data subject requests verwerken<div class="desc">Inzage, correctie, verwijdering — binnen 30 dagen reageren, documenteren</div></div></li>
+      <li><span class="freq monthly">Maandelijks</span><div class="task-text">App Store & Play Store policy changes checken<div class="desc">Privacy-eisen, subscription regels, AI-disclosure vereisten monitoren</div></div></li>
+      <li><span class="freq monthly">Maandelijks</span><div class="task-text">RevenueCat configuratie audit<div class="desc">Offerings, trial-lengtes, pricing matchen met App Store/Play Store configuratie</div></div></li>
+      <li><span class="freq quarterly">Kwartaal</span><div class="task-text">Privacy policy & algemene voorwaarden reviewen<div class="desc">Bijwerken bij nieuwe features, AI-vendors, data-retentie wijzigingen</div></div></li>
+      <li><span class="freq quarterly">Kwartaal</span><div class="task-text">DPA audit — verwerkersovereenkomsten leveranciers<div class="desc">Supabase, AssemblyAI, OpenAI, Mollie, RevenueCat, OneSignal — actuele DPA's verifiëren</div></div></li>
+      <li><span class="freq quarterly">Kwartaal</span><div class="task-text">App privacy declarations verifiëren<div class="desc">Data-verzameling in App Store Connect en Play Console klopt met werkelijkheid</div></div></li>
+    </ul>
+  </div>
+
+  <div class="task-group">
+    <h3>Financieel & Fiscaal (Securyflex B.V.)</h3>
+    <ul class="task-list">
+      <li><span class="freq quarterly">Kwartaal</span><div class="task-text">BTW-aangifte indienen<div class="desc">Omzetbelasting berekenen en indienen, deadline: laatste werkdag maand na kwartaal</div></div></li>
+      <li><span class="freq quarterly">Kwartaal</span><div class="task-text">Belastingvoorziening reserveren<div class="desc">15-20% van netto winst apart zetten voor VPB (19%) en dividendbelasting</div></div></li>
+      <li><span class="freq quarterly">Kwartaal</span><div class="task-text">Mollie & bank reconciliatie<div class="desc">Mollie-uitbetalingen matchen met bankafschriften, openstaande posten opschonen</div></div></li>
+      <li><span class="freq yearly">Jaarlijks</span><div class="task-text">Jaarrekening & VPB-aangifte voorbereiden<div class="desc">Winst- & verliesrekening, balans opstellen, deadline 1 mei volgend jaar. Overweeg boekhouder (€500-1000/jr)</div></div></li>
+    </ul>
+  </div>
+
+  <div class="task-group">
+    <h3>Support & Community</h3>
+    <ul class="task-list">
+      <li><span class="freq daily">Dagelijks</span><div class="task-text">Support inbox triagen (max 30 min)<div class="desc">Alle berichten binnen 24 uur beantwoorden, terugkerende vragen notieren voor FAQ</div></div></li>
+      <li><span class="freq biweekly">2-wekelijks</span><div class="task-text">FAQ & knowledge base uitbreiden<div class="desc">Top 3-5 veelgestelde vragen toevoegen: transcriptie-kwaliteit, abonnementen, privacy</div></div></li>
+      <li><span class="freq biweekly">2-wekelijks</span><div class="task-text">Community engagement<div class="desc">Reddit, Indie Hackers, Product Hunt monitoren op TalkMark-mentions en transcriptie-vragen</div></div></li>
+      <li><span class="freq monthly">Maandelijks</span><div class="task-text">Support metrics reviewen<div class="desc">Gemiddelde responstijd, oplossingspercentage, churn-correlatie met support-contacten</div></div></li>
     </ul>
   </div>
 </section>
